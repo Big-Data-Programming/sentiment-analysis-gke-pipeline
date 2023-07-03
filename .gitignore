@@ -1,0 +1,13 @@
+# IDE specific
+.idea/
+.vscode/
+
+# Dataset specific
+*.csv
+*.xlsx
+
+# Cache files
+*.pyc
+
+# Byte compiled
+__pycache__/
