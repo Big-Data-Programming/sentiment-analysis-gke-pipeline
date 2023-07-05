@@ -41,6 +41,11 @@ def train(config: dict, device: str, training_params: dict, dataset_params: dict
     # Load model (downloads from hub for the first time)
     model = Model.from_config(training_params.get("train_mode"))
     model = model.from_pretrained(training_params.get("base-model-name"), config=model_config)
+    for params in model.parameters():
+        params.requires_grad = False
+
+    for params in model.classifier.parameters():
+        params.requires_grad = True
 
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(training_params.get("base-model-name"))

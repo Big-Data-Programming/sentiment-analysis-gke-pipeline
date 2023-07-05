@@ -26,6 +26,7 @@ If running for the first time follow below steps :
 - [x] Complete Training code
 - [x] Setup pre-commit
 - [ ] Add more preprocessing steps
+- [ ] Explore ideas for inference (API, csv file, hugging face model card)
 - [ ] Complete inference code in `sa_inference_module`
 - [ ] Version control on dataset, model (Explore MLFlow)
 - [ ] CI / CD (Devops)
