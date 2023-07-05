@@ -58,6 +58,9 @@ class LemmaPreprocessor(BasePreprocessor):
         return " ".join([token.lemma_ for token in self.spacy_model(text)])
 
 
+# TODO: Add more preprocessing steps
+
+
 class StackedPreprocessor(BasePreprocessor):
     def __init__(self, preprocessors: Optional[Dict[str, Optional[Dict]]] = None):
 

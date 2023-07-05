@@ -59,7 +59,6 @@ class SentimentIterableDataset(IterableDataset):
                     i : i + 8
                 ]
 
-                # TODO: Preprocessing steps to be added here
                 sentences_minibatch: Dict[str, List[str]] = self.tokenizer(
                     self.preprocessors(list(data.iloc[:, 5].values)[i : i + 8]),
                     add_special_tokens=False,
