@@ -1,5 +1,5 @@
 import os.path
-from typing import Dict, Generator, List, Tuple
+from typing import Dict, Generator, List, Optional, Tuple
 
 import pandas as pd
 import torch
@@ -7,6 +7,7 @@ from torch.utils.data import IterableDataset
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
+from sa_train.sa_train_module.data.data_cleaner import StackedPreprocessor
 from sa_train.sa_train_module.data.kaggle_dataset import (
     get_dataset_length,
     get_file_names,
@@ -30,6 +31,7 @@ class SentimentIterableDataset(IterableDataset):
         self,
         csv_file: str,
         tokenizer,
+        preprocessors: Optional[Dict] = None,
         chunk_size: int = 1000,
         create_split: bool = False,
         split_type: str = "train",
@@ -43,6 +45,7 @@ class SentimentIterableDataset(IterableDataset):
         self.split_type = split_type
         self.max_seq_len = max_seq_len
         self.batch_size = batch_size
+        self.preprocessors = StackedPreprocessor(preprocessors)
 
     def __len__(self):
         return get_dataset_length(self.csv_file, self.split_type) // self.batch_size
@@ -58,7 +61,7 @@ class SentimentIterableDataset(IterableDataset):
 
                 # TODO: Preprocessing steps to be added here
                 sentences_minibatch: Dict[str, List[str]] = self.tokenizer(
-                    list(data.iloc[:, 5].values)[i : i + 8],
+                    self.preprocessors(list(data.iloc[:, 5].values)[i : i + 8]),
                     add_special_tokens=False,
                     truncation=True,
                     max_length=self.max_seq_len,

@@ -11,6 +11,15 @@ dataset_params:
   raw_dataset_file: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/sa_data_storage/training.1600000.processed.noemoticon.csv"
   max_length: 128
   batch_size: 32
+  preprocessors:
+    base_cleaning:
+      {}
+    lowcase:
+      {}
+    stem:
+      language: 'english'
+    lemma:
+      model_name: 'en_core_web_sm'
 
 
 

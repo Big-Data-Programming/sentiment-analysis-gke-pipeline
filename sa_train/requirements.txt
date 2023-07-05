@@ -3,3 +3,5 @@ torch==2.0.1
 pandas
 pytorch-lightning
 wandb
+nltk
+spacy

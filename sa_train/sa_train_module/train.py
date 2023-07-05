@@ -46,8 +46,18 @@ def train(config: dict, device: str, training_params: dict, dataset_params: dict
     tokenizer = AutoTokenizer.from_pretrained(training_params.get("base-model-name"))
 
     # Load streaming dataset
-    train_dataset = SentimentIterableDataset(dataset_params.get("raw_dataset_file"), tokenizer, split_type="train")
-    valid_dataset = SentimentIterableDataset(dataset_params.get("raw_dataset_file"), tokenizer, split_type="valid")
+    train_dataset = SentimentIterableDataset(
+        dataset_params.get("raw_dataset_file"),
+        tokenizer,
+        split_type="train",
+        preprocessors=dataset_params.get("preprocessors"),
+    )
+    valid_dataset = SentimentIterableDataset(
+        dataset_params.get("raw_dataset_file"),
+        tokenizer,
+        split_type="valid",
+        preprocessors=dataset_params.get("preprocessors"),
+    )
 
     # Loggers
     loggers = init_model_loggers(training_params["logging"]["log_dir"])
