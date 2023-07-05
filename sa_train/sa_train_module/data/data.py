@@ -44,7 +44,7 @@ class SentimentIterableDataset(IterableDataset):
         self.batch_size = batch_size
 
     def __len__(self):
-        return get_dataset_length(self.csv_file)
+        return get_dataset_length(self.csv_file, self.split_type) // self.batch_size
 
     def __iter__(self) -> Generator[Tuple[List[str], Dict[str, List[str]]], None, None]:
         for data in kaggle_dataset_iterator(
@@ -52,7 +52,12 @@ class SentimentIterableDataset(IterableDataset):
         ):
 
             for i in range(0, self.chunk_size, self.batch_size):
-                labels_minibatch: List[int] = list(data.iloc[:, 0].values)[i : i + 8]
+                # Label mapping is also done here, 0 - negative sentiment, 1 - positive sentiment
+                labels_minibatch: List[int] = list(data.iloc[:, 0].apply(lambda x: 0 if x == 0 else 1).values)[
+                    i : i + 8
+                ]
+
+                # TODO: Preprocessing steps to be added here
                 sentences_minibatch: Dict[str, List[str]] = self.tokenizer(
                     list(data.iloc[:, 5].values)[i : i + 8],
                     add_special_tokens=False,

@@ -1,7 +1,6 @@
 #################
 # GLOBAL PARAMS #
 #################
-base_dir: '/data/prabhupad/scratch/data/csr/experiments_2/'
 seed: &seed 42
 
 
@@ -21,6 +20,7 @@ dataset_params:
 ###################
 training_params:
   base-model-name: "cardiffnlp/twitter-roberta-base"
+  num_classes: 2
   train_mode: "fine_tune_base_model"
   tokenizer: 'bert-base-uncased'
   learning_rate: 1e-5
@@ -39,13 +39,17 @@ training_params:
   trainer:
     max_steps: 2.e+5
 #    max_epochs: 20
-#    accumulate_grad_batches: 1
+#    accumulate_grad_batches: 1 # use when memory is not sufficient
     gradient_clip_val: 1
-    precision: 16-mixed
+    precision: bf16-mixed
+#    precision: 16-mixed
     log_every_n_steps: 50
     val_check_interval: 1000
   logging:
     log_dir: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/logs"
 
-  artifacts:
-    model_store_dir:
+  callbacks:
+    dirpath: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/logs/models"
+    monitor_var: 'train_loss_step'
+    monitor_var_mode: 'max'
+    save_top_k: 1

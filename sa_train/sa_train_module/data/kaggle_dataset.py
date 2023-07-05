@@ -14,8 +14,10 @@ def get_label_counts(df: pd.DataFrame) -> Dict[str, int]:
     return label_count
 
 
-def get_dataset_length(file_name: str):
-    return sum([len(i) for i in pd.read_csv(file_name, encoding="latin-1", chunksize=1000)])
+def get_dataset_length(file_name: str, split_type: str) -> int:
+    data_files = get_file_names(file_name)
+    file_map = {"train": data_files[0], "valid": data_files[1], "test": data_files[2]}
+    return sum([len(i) for i in pd.read_csv(file_map[split_type], encoding="latin-1", chunksize=1000)])
 
 
 def get_file_names(file_name: str) -> tuple[str, str, str]:

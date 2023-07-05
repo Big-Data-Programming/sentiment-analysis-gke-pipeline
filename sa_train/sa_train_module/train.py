@@ -4,7 +4,8 @@ import pytorch_lightning as pl
 import torch
 import wandb
 import yaml
-from transformers import AutoTokenizer, BertConfig
+from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+from transformers import AutoConfig, AutoTokenizer
 
 from common.utils import init_model_loggers
 from sa_train.sa_train_module.data.data import SentimentIterableDataset
@@ -14,16 +15,32 @@ from sa_train.sa_train_module.training.lightning_model_wrapper import (
 )
 
 
-def train(device: str, training_params: dict, dataset_params: dict, seed: int, config: dict):
+def init_model_callbacks(training_params: dict) -> list:
+    model_checkpoint = ModelCheckpoint(
+        dirpath=training_params["callbacks"]["dirpath"],
+        filename="best_model",
+        monitor=training_params["callbacks"]["monitor_var"],
+        mode=training_params["callbacks"]["monitor_var_mode"],
+        save_top_k=3,  # Save the top 3 models based on the monitored metric
+    )
+    callbacks = [
+        LearningRateMonitor(logging_interval="step"),
+        model_checkpoint,
+    ]
+
+    return callbacks
+
+
+def train(config: dict, device: str, training_params: dict, dataset_params: dict, seed: int):
     # Global seeding
     pl.seed_everything(seed=seed)
 
     # load HF configs
-    model_config = BertConfig.from_pretrained(training_params.get("base-model-name"))
+    model_config = AutoConfig.from_pretrained(training_params.get("base-model-name"))
 
     # Load model (downloads from hub for the first time)
     model = Model.from_config(training_params.get("train_mode"))
-    model = model.from_pretrained(training_params.get("base-model-name"), model_config)
+    model = model.from_pretrained(training_params.get("base-model-name"), config=model_config)
 
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(training_params.get("base-model-name"))
@@ -35,20 +52,35 @@ def train(device: str, training_params: dict, dataset_params: dict, seed: int, c
     # Loggers
     loggers = init_model_loggers(training_params["logging"]["log_dir"])
 
-    model.to(device)
+    # PL callbacks
+    callbacks = init_model_callbacks(training_params)
 
+    # PL wrapper
     model_wrapped = LightningModelWrapper(
         model=model,
         optimizer_params=training_params["optimizer"],
         lr_scheduler_params=training_params["lr_scheduler"] if "lr_scheduler" in training_params else None,
-    ).to(device)
+        unique_config=config,
+    )
 
+    # Get available devices
+    try:
+        devices = [int(device.split(":")[-1])]
+        accelerator = "gpu"
+    except ValueError:
+        devices = "auto"
+        accelerator = "cpu"
+
+    # Trainer initialization
     trainer = pl.Trainer(
         logger=loggers,
-        devices=device,
+        devices=devices,
+        accelerator=accelerator,
+        callbacks=callbacks,
         **training_params["trainer"],
     )
 
+    # Initiate trainer
     trainer.fit(model=model_wrapped, train_dataloaders=train_dataset, val_dataloaders=valid_dataset, ckpt_path="last")
 
     wandb.finish()
@@ -70,7 +102,7 @@ def main():
     args = parse_args()
     config = yaml.safe_load(open(args.config, "r"))
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    train(device=device, **config)
+    train(config=config, device=device, **config)
 
 
 if __name__ == "__main__":
