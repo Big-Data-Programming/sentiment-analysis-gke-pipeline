@@ -1,3 +1,4 @@
+import os.path
 from typing import Dict, Generator, List, Tuple
 
 import pandas as pd
@@ -13,12 +14,12 @@ from sa_train.sa_train_module.data.kaggle_dataset import (
 )
 
 
-def kaggle_dataset_iterator(file_name, chunk_size=1000, create_split=False, split_type="train"):
-    if create_split:
-        split_dataset(file_name)
-
+def kaggle_dataset_iterator(file_name, chunk_size=1000, split_type="train") -> pd.DataFrame:
     data_files = get_file_names(file_name)
     file_map = {"train": data_files[0], "valid": data_files[1], "test": data_files[2]}
+    if os.path.isfile(file_map[split_type]) is False:
+        split_dataset(file_name)
+
     dataset_path = file_map[split_type]
 
     return pd.read_csv(dataset_path, encoding="latin-1", chunksize=chunk_size)
@@ -47,9 +48,7 @@ class SentimentIterableDataset(IterableDataset):
         return get_dataset_length(self.csv_file, self.split_type) // self.batch_size
 
     def __iter__(self) -> Generator[Tuple[List[str], Dict[str, List[str]]], None, None]:
-        for data in kaggle_dataset_iterator(
-            self.csv_file, chunk_size=self.chunk_size, create_split=self.create_split, split_type=self.split_type
-        ):
+        for data in kaggle_dataset_iterator(self.csv_file, chunk_size=self.chunk_size, split_type=self.split_type):
 
             for i in range(0, self.chunk_size, self.batch_size):
                 # Label mapping is also done here, 0 - negative sentiment, 1 - positive sentiment
