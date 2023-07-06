@@ -31,4 +31,5 @@ jobs:
       run: |
         conda install pytest
         cd sa_app/src
+        pip install -e .
         pytest tests/
