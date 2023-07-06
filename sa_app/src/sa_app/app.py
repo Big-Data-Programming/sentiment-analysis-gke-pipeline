@@ -5,14 +5,11 @@ import torch
 import wandb
 import yaml
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+from sa_app.common.utils import init_model_loggers
+from sa_app.data.data import SentimentIterableDataset
+from sa_app.models.model import Model
+from sa_app.training.lightning_model_wrapper import LightningModelWrapper
 from transformers import AutoConfig, AutoTokenizer
-
-from common.utils import init_model_loggers
-from sa_train.sa_train_module.data.data import SentimentIterableDataset
-from sa_train.sa_train_module.models.model import Model
-from sa_train.sa_train_module.training.lightning_model_wrapper import (
-    LightningModelWrapper,
-)
 
 
 def init_model_callbacks(training_params: dict) -> list:
@@ -105,9 +102,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--config",
-        default="sa_train/train_cfg.yml",
+        default="sa_app/app_cfg.yml",
         type=str,
         help="Path to config",
+    )
+    parser.add_argument(
+        "--mode",
+        default="train",
+        type=str,
+        help="mode of execution",
     )
 
     return parser.parse_args()
@@ -117,7 +120,10 @@ def main():
     args = parse_args()
     config = yaml.safe_load(open(args.config, "r"))
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    train(config=config, device=device, **config)
+    if args.mode == "train":
+        train(config=config, device=device, **config)
+    # else:
+    #     inference(config=config, device=device, **config)
 
 
 if __name__ == "__main__":

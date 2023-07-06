@@ -3,16 +3,11 @@ from typing import Dict, Generator, List, Optional, Tuple
 
 import pandas as pd
 import torch
+from sa_app.data.data_cleaner import StackedPreprocessor
+from sa_app.data.kaggle_dataset import get_dataset_length, get_file_names, split_dataset
 from torch.utils.data import IterableDataset
 from tqdm import tqdm
 from transformers import AutoTokenizer
-
-from sa_train.sa_train_module.data.data_cleaner import StackedPreprocessor
-from sa_train.sa_train_module.data.kaggle_dataset import (
-    get_dataset_length,
-    get_file_names,
-    split_dataset,
-)
 
 
 def kaggle_dataset_iterator(file_name, chunk_size=1000, split_type="train") -> pd.DataFrame:
@@ -53,14 +48,14 @@ class SentimentIterableDataset(IterableDataset):
     def __iter__(self) -> Generator[Tuple[List[str], Dict[str, List[str]]], None, None]:
         for data in kaggle_dataset_iterator(self.csv_file, chunk_size=self.chunk_size, split_type=self.split_type):
 
-            for i in range(0, self.chunk_size, self.batch_size):
+            for i in range(0, len(data), self.batch_size):
                 # Label mapping is also done here, 0 - negative sentiment, 1 - positive sentiment
-                labels_minibatch: List[int] = list(data.iloc[:, 0].apply(lambda x: 0 if x == 0 else 1).values)[
-                    i : i + 8
-                ]
+                labels_minibatch: List[int] = list(
+                    data.iloc[i : i + self.batch_size, 0].apply(lambda x: 0 if x == 0 else 1).values
+                )
 
                 sentences_minibatch: Dict[str, List[str]] = self.tokenizer(
-                    self.preprocessors(list(data.iloc[:, 5].values)[i : i + 8]),
+                    self.preprocessors(list(data.iloc[i : i + self.batch_size, 5].values)),
                     add_special_tokens=False,
                     truncation=True,
                     max_length=self.max_seq_len,

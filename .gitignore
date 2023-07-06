@@ -5,9 +5,28 @@
 # Dataset specific
 *.csv
 *.xlsx
+!sample*.csv
+
 
 # Cache files
 *.pyc
 
 # Byte compiled
 __pycache__/
+.pytest_cache/
+
+
+# Password files
+*-creds.json
+secret_keys
+
+# Model files
+config_files/
+*.bin
+tokenizer/
+
+# Package related files
+dist/
+*.egg-info/
+*.whl
+*.tag.gz

@@ -4,11 +4,10 @@ from typing import Any, Dict, Optional, Union
 
 import pytorch_lightning as pl
 import torch
+from sa_app.training.optmizer import LearningRateScheduler, Optimizer
 from torch.nn import CrossEntropyLoss
 from torchmetrics import Accuracy, MeanMetric, Metric
 from transformers import PreTrainedModel
-
-from sa_train.sa_train_module.training.optmizer import LearningRateScheduler, Optimizer
 
 
 class Split(str, Enum):
