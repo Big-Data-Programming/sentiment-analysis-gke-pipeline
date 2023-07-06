@@ -26,7 +26,7 @@ jobs:
         python -m pip install --upgrade pip
         cd sa_app/src
         pip install -r requirements.txt
-        python -m spacy download en_code_web_sm
+        python -m spacy download en_core_web_sm
     - name: Test with pytest
       run: |
         conda install pytest
