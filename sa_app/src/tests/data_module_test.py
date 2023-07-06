@@ -18,7 +18,7 @@ def common_text_processor_config():
 
 @pytest.fixture
 def sample_file_name():
-    return "sample.csv"
+    return "tests/sample.csv"
 
 
 @pytest.fixture
