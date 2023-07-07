@@ -21,9 +21,9 @@ __pycache__/
 secret_keys
 
 # Model files
-config_files/
 *.bin
-tokenizer/
+sa_app/config_files/tokenizer/
+sa_app/config_files/model/
 
 # Package related files
 dist/
