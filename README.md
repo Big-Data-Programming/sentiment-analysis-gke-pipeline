@@ -16,7 +16,7 @@
 
 If running for the first time follow below steps :
 1. Download dataset from [here](https://www.kaggle.com/datasets/kazanova/sentiment140/download?datasetVersionNumber=2)
-2. Run `python -m spacy download en_code_web_sm`
+2. Run `python -m spacy download en_core_web_sm`
 3. `cd sa_app/src`
 4. Run this cmd from the root dir of training module (i.e. sa_train/sa_train_module) : `python training/train.py --config <path to train_cfg.yml file>`
 
