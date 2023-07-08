@@ -1,3 +1,6 @@
+![example workflow](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/python-package-conda.yml/badge.svg)
+
+
 ## Installation
 
 1. Clone repository.
