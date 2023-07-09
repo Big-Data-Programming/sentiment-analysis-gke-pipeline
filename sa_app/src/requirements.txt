@@ -1,7 +1,7 @@
 transformers==4.28.1
 torch==2.0.1
-pandas
-pytorch-lightning
-wandb
-nltk
-spacy
+pandas==1.5.1
+pytorch-lightning==2.0.4
+wandb==0.14.2
+nltk==3.8.1
+spacy==3.6.0

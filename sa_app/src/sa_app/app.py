@@ -1,18 +1,19 @@
-import argparse
+from typing import Dict, List, Tuple
 
 import pytorch_lightning as pl
 import torch
 import wandb
 import yaml
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
-from sa_app.common.utils import init_model_loggers
+from pytorch_lightning.loggers import WandbLogger
+from sa_app.common.utils import init_model_loggers, parse_args
 from sa_app.data.data import SentimentIterableDataset
 from sa_app.models.model import Model
 from sa_app.training.lightning_model_wrapper import LightningModelWrapper
-from transformers import AutoConfig, AutoTokenizer
+from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 
 
-def init_model_callbacks(training_params: dict) -> list:
+def init_model_callbacks(training_params: dict) -> List:
     model_checkpoint = ModelCheckpoint(
         dirpath=training_params["callbacks"]["dirpath"],
         filename="best_model",
@@ -28,10 +29,7 @@ def init_model_callbacks(training_params: dict) -> list:
     return callbacks
 
 
-def train(config: dict, device: str, training_params: dict, dataset_params: dict, seed: int):
-    # Global seeding
-    pl.seed_everything(seed=seed)
-
+def load_model(training_params: Dict) -> Tuple[Dict, AutoModelForSequenceClassification]:
     # load HF configs
     model_config = AutoConfig.from_pretrained(training_params.get("base-model-name"))
 
@@ -43,10 +41,12 @@ def train(config: dict, device: str, training_params: dict, dataset_params: dict
 
     for params in model.classifier.parameters():
         params.requires_grad = True
+    return model_config, model
 
-    # Load tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(training_params.get("base-model-name"))
 
+def get_dataset(
+    dataset_params: Dict, tokenizer: AutoTokenizer
+) -> Tuple[SentimentIterableDataset, SentimentIterableDataset]:
     # Load streaming dataset
     train_dataset = SentimentIterableDataset(
         dataset_params.get("raw_dataset_file"),
@@ -60,11 +60,29 @@ def train(config: dict, device: str, training_params: dict, dataset_params: dict
         split_type="valid",
         preprocessors=dataset_params.get("preprocessors"),
     )
+    return train_dataset, valid_dataset
 
-    # Loggers
+
+def get_trainer(
+    loggers: List[WandbLogger], devices: List[str] | str, accelerator: str, callbacks: List, training_params: Dict
+) -> pl.Trainer:
+    trainer = pl.Trainer(
+        logger=loggers,
+        devices=devices,
+        accelerator=accelerator,
+        callbacks=callbacks,
+        **training_params["trainer"],
+    )
+    return trainer
+
+
+def train(config: dict, device: str, training_params: Dict, dataset_params: Dict, seed: int, inference_params: Dict):
+    # Global seeding
+    pl.seed_everything(seed=seed)
+    model_config, model = load_model(training_params)
+    tokenizer = AutoTokenizer.from_pretrained(training_params.get("base-model-name"))
+    train_dataset, valid_dataset = get_dataset(dataset_params, tokenizer)
     loggers = init_model_loggers(training_params["logging"]["log_dir"])
-
-    # PL callbacks
     callbacks = init_model_callbacks(training_params)
 
     # PL wrapper
@@ -84,36 +102,12 @@ def train(config: dict, device: str, training_params: dict, dataset_params: dict
         accelerator = "cpu"
 
     # Trainer initialization
-    trainer = pl.Trainer(
-        logger=loggers,
-        devices=devices,
-        accelerator=accelerator,
-        callbacks=callbacks,
-        **training_params["trainer"],
-    )
+    trainer = get_trainer(loggers, devices, accelerator, callbacks, training_params)
 
     # Initiate trainer
     trainer.fit(model=model_wrapped, train_dataloaders=train_dataset, val_dataloaders=valid_dataset, ckpt_path="last")
 
     wandb.finish()
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--config",
-        default="sa_app/app_cfg.yml",
-        type=str,
-        help="Path to config",
-    )
-    parser.add_argument(
-        "--mode",
-        default="train",
-        type=str,
-        help="mode of execution",
-    )
-
-    return parser.parse_args()
 
 
 def main():
