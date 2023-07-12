@@ -33,6 +33,6 @@ If running for the first time follow below steps :
 - [ ] Create two containers :
       - [ ] For training / inferencing via Flask API
       - [ ] For dashboard APP deployment for GCP App engine.
-- [ ] Complete inference code in `sa_inference_module`
-- [ ] Version control on dataset, model (Explore MLFlow)
+- [ ] Complete inference code in `sa_inference_module` : Add the flask API
+- [ ] Version control on dataset, model (Explore MLFlow) : Wandb articact upload code.
 - [ ] CI / CD (Devops)
