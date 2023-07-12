@@ -9,6 +9,7 @@ seed: &seed 42
 ###############
 dataset_params:
   raw_dataset_file: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/sa_data_storage/training.1600000.processed.noemoticon.csv"
+  labels_mapping: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/bdp2_apr22_exam-bdp2_apr22_group_2/sa_app/config_files/mapping.txt"
   max_length: 128
   batch_size: 32
   preprocessors:
@@ -62,3 +63,11 @@ training_params:
     monitor_var: 'train_loss_step'
     monitor_var_mode: 'max'
     save_top_k: 1
+
+
+####################
+# Inference params #
+####################
+
+inference_params:
+  model_dir: "cardiffnlp/twitter-roberta-base"
