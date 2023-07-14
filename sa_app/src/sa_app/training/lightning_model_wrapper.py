@@ -87,7 +87,7 @@ class LightningModelWrapper(pl.LightningModule):
         self.log(f"{split_type}_acc_step", acc_fn, batch_size=self.trainer.train_dataloader.batch_size)
 
     def log_epoch_end(self, loss_fn: Metric, split_type: Split):
-        loss_fn = loss_fn.compute() if loss_fn.value != 0 else None
+        loss_fn = loss_fn.compute() if loss_fn.mean_value != 0 else None
         if loss_fn is not None:
             self.log(f"{split_type}-loss-epoch", loss_fn)
 
@@ -120,7 +120,7 @@ class LightningModelWrapper(pl.LightningModule):
         else:
             return optimizer
 
-    def save_hf_checkpoint(self, path: Union[str, Path]) -> None:
+    def sav(self, path: Union[str, Path]) -> None:
         """Save the model using the original HF AutoModel.
 
         This is useful for when you'd like to export the model to the hub.

@@ -1,17 +1,28 @@
 [build-system]
-requires = ["setuptools > =61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-
-[project]
+[tool.poetry]
 name = "sa_app"
 version = "0.0.0"
-authors = [{name="prabhu", email="prabhupad26@gmail.com"}]
+authors = ["prabhu <prabhupad26@gmail.com>"]
 description="Sentiment analyzer app"
-readme="README.md"
-requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+transformers = "4.28.1"
+torch = "2.0.1"
+pandas = "1.5.1"
+pytorch-lightning = "2.0.4"
+wandb = "^0.14.2"
+nltk = "^3.8.1"
+spacy = "3.6.0"
+
+
+[project.scripts]
+sa_app = "sa_app.app:main"

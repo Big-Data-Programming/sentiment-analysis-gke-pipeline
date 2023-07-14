@@ -27,6 +27,8 @@ jobs:
         cd sa_app/src
         pip install -r requirements.txt
         python -m spacy download en_core_web_sm
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry build
     - name: Test with pytest
       run: |
         conda install pytest
