@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sa_app"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["prabhu <prabhupad26@gmail.com>"]
 description="Sentiment analyzer app"
 classifiers = [
@@ -22,7 +22,9 @@ pytorch-lightning = "2.0.4"
 wandb = "^0.14.2"
 nltk = "^3.8.1"
 spacy = "3.6.0"
+flask = "^2.3.2"
 
 
 [project.scripts]
 sa_app = "sa_app.app:main"
+inference_app = "sa_app.inference_app:main"
