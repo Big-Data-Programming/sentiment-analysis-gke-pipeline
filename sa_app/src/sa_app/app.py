@@ -7,7 +7,7 @@ import yaml
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from sa_app.common.utils import init_model_loggers, parse_args
-from sa_app.data.data import SentimentIterableDataset
+from sa_app.data.data import InitializeDataset, SentimentIterableDataset
 from sa_app.models.model import Model
 from sa_app.training.lightning_model_wrapper import LightningModelWrapper
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
@@ -47,15 +47,17 @@ def load_model(training_params: Dict) -> Tuple[Dict, AutoModelForSequenceClassif
 def get_dataset(
     dataset_params: Dict, tokenizer: AutoTokenizer
 ) -> Tuple[SentimentIterableDataset, SentimentIterableDataset]:
+    dataset_obj = InitializeDataset(dataset_params)
+    raw_dataset_file, _ = dataset_obj()
     # Load streaming dataset
     train_dataset = SentimentIterableDataset(
-        dataset_params.get("raw_dataset_file"),
+        raw_dataset_file,
         tokenizer,
         split_type="train",
         preprocessors=dataset_params.get("preprocessors"),
     )
     valid_dataset = SentimentIterableDataset(
-        dataset_params.get("raw_dataset_file"),
+        raw_dataset_file,
         tokenizer,
         split_type="valid",
         preprocessors=dataset_params.get("preprocessors"),
