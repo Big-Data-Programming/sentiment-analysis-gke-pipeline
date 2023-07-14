@@ -3,6 +3,7 @@ from typing import Dict
 import torch
 import yaml
 from sa_app.common.utils import load_mapping, parse_args
+from sa_app.data.data import InitializeDataset
 from sa_app.data.data_cleaner import StackedPreprocessor
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -17,7 +18,9 @@ class InferenceEngine:
         self.model = AutoModelForSequenceClassification.from_pretrained(self.model_path).to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(training_params["tokenizer"])
         self.preprocessors = StackedPreprocessor(dataset_params["preprocessors"])
-        self.label_mapping = load_mapping(dataset_params["labels_mapping"])
+        dataset_obj = InitializeDataset(dataset_params)
+        _, label_mapping_path = dataset_obj()
+        self.label_mapping = load_mapping(label_mapping_path)
 
     def perform_inference(self, sentence):
         # Preprocess the input sentence
