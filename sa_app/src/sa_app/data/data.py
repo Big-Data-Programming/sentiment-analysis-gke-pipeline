@@ -31,7 +31,7 @@ class InitializeDataset:
             wandb_artifact_version = wandb_storage.get("wandb_artifact_version")
             labels_mapping_file_name = wandb_storage.get("labels_mapping_file_name")
             import wandb
-
+            wandb.login(key=os.getenv("WANDB_API_KEY"))
             run = wandb.init(entity=wandb_user_id, project=wandb_project_name, job_type="download_dataset")
             artifact = run.use_artifact(
                 f"{wandb_user_id}/{wandb_project_name}/{wandb_artifact_name}:{wandb_artifact_version}",

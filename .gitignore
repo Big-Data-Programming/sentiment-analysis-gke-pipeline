@@ -20,6 +20,7 @@ __pycache__/
 # Password files
 *-creds.json
 secret_keys
+env_variables.list
 
 # Model files
 *.bin
