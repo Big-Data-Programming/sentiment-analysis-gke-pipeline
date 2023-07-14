@@ -21,7 +21,7 @@ pandas = "1.5.1"
 pytorch-lightning = "2.0.4"
 wandb = "^0.14.2"
 nltk = "^3.8.1"
-spacy = "3.5.4"
+spacy = "3.6.0"
 
 
 [project.scripts]
