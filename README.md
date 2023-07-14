@@ -15,6 +15,14 @@
    * Optional: Run hooks once on all files via `pre-commit run --all-files`
 
 
+## Wandb cmds
+
+1. Upload dataset:
+   > Run `python sa_app/scripts/wandb_init.py`
+2. Download artifacts:
+   > `wandb artifact get prabhupad26/sa-roberta/sentiment-dataset:latest --root training.1600000.processed.noemoticon.csv`
+
+
 ## Run training
 
 If running for the first time follow below steps :
@@ -22,6 +30,8 @@ If running for the first time follow below steps :
 2. Run `python -m spacy download en_core_web_sm`
 3. `cd sa_app/src`
 4. Run this cmd from the root dir of training module (i.e. sa_train/sa_train_module) : `python training/train.py --config <path to train_cfg.yml file>`
+
+
 
 
 ## TODOS

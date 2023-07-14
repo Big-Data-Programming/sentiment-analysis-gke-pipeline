@@ -10,6 +10,7 @@
 
 # Cache files
 *.pyc
+wandb/
 
 # Byte compiled
 __pycache__/
@@ -30,3 +31,8 @@ dist/
 *.egg-info/
 *.whl
 *.tag.gz
+
+# Poetry files
+poetry.lock
+build/
+artifacts/
