@@ -31,7 +31,10 @@ If running for the first time follow below steps :
 3. `cd sa_app/src`
 4. Run this cmd from the root dir of training module (i.e. sa_train/sa_train_module) : `python training/train.py --config <path to train_cfg.yml file>`
 
+## Build docker image
 
+1. Run this cmd from the root path of this repo : `docker build -t <name the image> .`
+2. 
 
 
 ## TODOS

@@ -6,6 +6,8 @@ COPY sa_app/config_files/app_cfg.yml container_src/
 
 RUN pip install sa-app
 
+RUN python -m spacy download en_core_web_sm
+
 WORKDIR /container_src
 
-CMD ["python", "-m", "sa_app.app", "--config", "/container_src/file.yaml"]
+CMD ["python", "-m", "sa_app.app", "--config", "/container_src/app_cfg.yml"]
