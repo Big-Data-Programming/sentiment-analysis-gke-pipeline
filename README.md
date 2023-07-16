@@ -34,7 +34,7 @@ If running for the first time follow below steps :
 ## Build docker image
 
 1. Run this cmd from the root path of this repo : `docker build -t <name the image> .`
-2. 
+2. -p 5000:5000
 
 
 ## TODOS
