@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List, Tuple
 
 import pytorch_lightning as pl
@@ -13,7 +14,7 @@ from sa_app.training.lightning_model_wrapper import LightningModelWrapper
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 
 
-def init_model_callbacks(training_params: dict) -> List:
+def init_model_callbacks(training_params: dict) -> List[LearningRateMonitor | ModelCheckpoint]:
     model_checkpoint = ModelCheckpoint(
         dirpath=training_params["callbacks"]["dirpath"],
         filename="best_model",
@@ -79,12 +80,15 @@ def get_trainer(
 
 
 def train(config: dict, device: str, training_params: Dict, dataset_params: Dict, seed: int, inference_params: Dict):
+    # wandb login
+    wandb.login(key=os.getenv("WANDB_API_KEY"))
+
     # Global seeding
     pl.seed_everything(seed=seed)
     model_config, model = load_model(training_params)
     tokenizer = AutoTokenizer.from_pretrained(training_params.get("base-model-name"))
     train_dataset, valid_dataset = get_dataset(dataset_params, tokenizer)
-    loggers = init_model_loggers(training_params["logging"]["log_dir"])
+    loggers = init_model_loggers(dataset_params, training_params)
     callbacks = init_model_callbacks(training_params)
 
     # PL wrapper
@@ -109,6 +113,10 @@ def train(config: dict, device: str, training_params: Dict, dataset_params: Dict
     # Initiate trainer
     trainer.fit(model=model_wrapped, train_dataloaders=train_dataset, val_dataloaders=valid_dataset, ckpt_path="last")
 
+    artifact = wandb.Artifact("best_model_checkpoint", type="trained-model")
+    artifact.add_file(callbacks[1].best_model_path)
+    wandb.run.log_artifact(artifact)
+
     wandb.finish()
 
 
@@ -118,8 +126,8 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     if args.mode == "train":
         train(config=config, device=device, **config)
-    # else:
-    #     inference(config=config, device=device, **config)
+    else:
+        raise NotImplementedError(f"Method {args.mode} not implemented")
 
 
 if __name__ == "__main__":

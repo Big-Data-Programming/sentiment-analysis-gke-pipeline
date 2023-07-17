@@ -1,12 +1,14 @@
 import argparse
 import csv
-from typing import List
+from typing import Dict, List
 
 from pytorch_lightning.loggers import WandbLogger
 
 
-def init_model_loggers(log_dir: str) -> List[WandbLogger]:
-    wandb_logger = WandbLogger(project="sa-roberta", save_dir=log_dir)
+def init_model_loggers(dataset_params: Dict, training_params: Dict) -> List[WandbLogger]:
+    wandb_project_name = dataset_params.get("wandb_storage").get("wandb_project_name")
+    log_dir = training_params.get("logging").get("log_dir")
+    wandb_logger = WandbLogger(project=wandb_project_name, save_dir=log_dir)
     return [
         wandb_logger,
     ]

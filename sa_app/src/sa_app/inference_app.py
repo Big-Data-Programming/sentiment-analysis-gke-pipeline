@@ -22,5 +22,10 @@ def get_sentiment():
     return jsonify(ie_obj.perform_inference(new_tweet["tweet_content"]))
 
 
+@app.route("/home")
+def test_fn():
+    return "Hello World!!"
+
+
 if __name__ == "__main__":
     app.run()

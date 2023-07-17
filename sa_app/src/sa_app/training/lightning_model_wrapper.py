@@ -7,7 +7,7 @@ import torch
 from sa_app.training.optmizer import LearningRateScheduler, Optimizer
 from torch.nn import CrossEntropyLoss
 from torchmetrics import Accuracy, MeanMetric, Metric
-from transformers import PreTrainedModel
+from transformers import AutoModelForSequenceClassification
 
 
 class Split(str, Enum):
@@ -22,7 +22,7 @@ class Split(str, Enum):
 class LightningModelWrapper(pl.LightningModule):
     def __init__(
         self,
-        model: PreTrainedModel,
+        model: AutoModelForSequenceClassification,
         optimizer_params: Optional[dict] = None,
         lr_scheduler_params: Optional[dict] = None,
         unique_config: Optional[dict] = None,
@@ -120,7 +120,7 @@ class LightningModelWrapper(pl.LightningModule):
         else:
             return optimizer
 
-    def sav(self, path: Union[str, Path]) -> None:
+    def save_model(self, path: Union[str, Path]) -> None:
         """Save the model using the original HF AutoModel.
 
         This is useful for when you'd like to export the model to the hub.
