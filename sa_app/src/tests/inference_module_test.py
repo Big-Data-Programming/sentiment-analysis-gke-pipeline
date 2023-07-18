@@ -1,5 +1,8 @@
+import os
+
 import pytest
 import torch
+import wandb
 import yaml
 from sa_app.inference.inference import InferenceEngine
 
@@ -11,6 +14,7 @@ def sample_config():
 
 
 def test_inference(sample_config):
+    wandb.login(key=os.getenv("WANDB_API_KEY"))
     config = sample_config
     device_in_use = "cuda" if torch.cuda.is_available() else "cpu"
     # Example usage

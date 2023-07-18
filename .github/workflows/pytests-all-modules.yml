@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
+    env:
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
 
     steps:
     - uses: actions/checkout@v3
