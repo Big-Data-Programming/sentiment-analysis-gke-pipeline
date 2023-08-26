@@ -8,7 +8,7 @@ seed: &seed 42
 # Data params #
 ###############
 dataset_params:
-  wandb_storage:
+  wandb_storage: # If this is defined the data artifacts are downloaded from wandb
     wandb_user_id: "prabhupad26"
     wandb_project_name: "sa-roberta"
     wandb_artifact_name: "sentiment-dataset"
@@ -16,7 +16,7 @@ dataset_params:
     wandb_artifact_version: "latest"
     training_file_type: "csv"
     labels_mapping_file_name: "mapping.txt"
-  local_storage:
+  local_storage: # If wandb_storage is not defined the data artifacts referred from local path configured below
     raw_dataset_file: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/sa_data_storage/training.1600000.processed.noemoticon.csv"
     labels_mapping: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/bdp2_apr22_exam-bdp2_apr22_group_2/sa_app/config_files/mapping.txt"
   max_length: 128

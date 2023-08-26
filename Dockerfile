@@ -4,7 +4,7 @@ RUN mkdir container_src
 
 COPY sa_app/config_files/app_cfg.yml container_src/
 
-RUN pip install sa-app==0.0.1
+RUN pip install sa-app
 
 RUN python -m spacy download en_core_web_sm
 

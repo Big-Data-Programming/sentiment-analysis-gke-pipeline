@@ -17,9 +17,10 @@
 
 ## Wandb cmds
 
-1. Upload dataset:
-   > Run `python sa_app/scripts/wandb_init.py`
-2. Download artifacts:
+1. To upload a dataset make sure you have the data in you local, wandb account project created and then run the below cmd (you can also upload multiple files):
+   > Run `python sa_app/scripts/wandb_init.py --entity <you_user_name> --project <name of wandb project> --artifact_name <artifact name> --artifact_locations <artifact local path>`
+   > Example `python sa_app/scripts/wandb_init.py --entity prabhupad26 --project sa-roberta --artifact_name sentiment-dataset --artifact_locations sa_data_storage/training.1600000.processed.noemoticon.csv` 
+2. To manually download the datasets run the below command with the desired file name:
    > `wandb artifact get prabhupad26/sa-roberta/sentiment-dataset:latest --root training.1600000.processed.noemoticon.csv`
 
 
