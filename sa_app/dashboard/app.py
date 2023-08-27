@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", category=UserWarning, message="Can't initializ
 
 # Initialize streamlit
 st.set_page_config(
-    page_title="Real-Time Data Science Dashboard",
+    page_title="Twitter Data Sentiment Analysis Dashboard",
     page_icon="✅",
     layout="wide",
 )
