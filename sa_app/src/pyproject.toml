@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sa_app"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["prabhu <prabhupad26@gmail.com>"]
 description="Sentiment analyzer app"
 classifiers = [
