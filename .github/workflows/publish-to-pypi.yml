@@ -31,5 +31,5 @@ jobs:
     - name: Publish to PyPI
       run: |
         cd sa_app/src
-        poetry config pypi-token.pypi PYPI_API_TOKEN
+        poetry config pypi-token.pypi $PYPI_API_TOKEN
         poetry publish --build
