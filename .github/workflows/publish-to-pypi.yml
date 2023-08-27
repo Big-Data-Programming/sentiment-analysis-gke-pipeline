@@ -1,0 +1,35 @@
+name: Publish sa_app to pypi repository
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+    env:
+      PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python -
+        export PATH="$HOME/.poetry/bin:$PATH"
+        poetry --version
+    - name: Install dependencies
+      run: |
+        cd sa_app/src
+        poetry install
+    - name: Publish to PyPI
+      run: |
+        cd sa_app/src
+        poetry config pypi-token.pypi PYPI_API_TOKEN
+        poetry publish --build
