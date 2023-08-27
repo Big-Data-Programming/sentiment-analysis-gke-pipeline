@@ -82,7 +82,6 @@ class SentimentIterableDataset(IterableDataset):
 
     def __iter__(self) -> Generator[Tuple[List[str], Dict[str, List[str]]], None, None]:
         for data in kaggle_dataset_iterator(self.file_map, chunk_size=self.chunk_size, split_type=self.split_type):
-
             for i in range(0, len(data), self.batch_size):
                 # Label mapping is also done here, 0 - negative sentiment, 1 - positive sentiment
                 labels_minibatch: List[int] = list(

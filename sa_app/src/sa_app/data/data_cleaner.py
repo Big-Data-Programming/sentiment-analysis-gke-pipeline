@@ -63,14 +63,12 @@ class LemmaPreprocessor(BasePreprocessor):
 
 class StackedPreprocessor(BasePreprocessor):
     def __init__(self, preprocessors: Optional[Dict[str, Optional[Dict]]] = None):
-
         if preprocessors is None:
             preprocessors = {}
 
         self.preprocessors = [PREPROCESSORS[name](**params) for name, params in preprocessors.items()]
 
     def __call__(self, text_batch: List[str]) -> List[str]:
-
         processed_batch = []
         for text in text_batch:
             for preprocessor in self.preprocessors:
