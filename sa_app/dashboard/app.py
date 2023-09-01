@@ -40,9 +40,7 @@ def initialize_inference_model():
 config, device_in_use, ie_obj = initialize_inference_model()
 
 
-dataset_url = (
-    "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/sa_data_storage/training.1600000.processed.noemoticon.test.csv"
-)
+dataset_url = "training.1600000.processed.noemoticon.test.csv"
 
 
 # read csv from a URL
