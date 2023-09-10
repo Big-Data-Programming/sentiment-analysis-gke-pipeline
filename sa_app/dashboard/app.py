@@ -6,7 +6,6 @@ import torch
 import yaml
 from sa_app.inference.inference import InferenceEngine
 from tqdm import tqdm
-import requests
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Can't initialize NVML")
 
