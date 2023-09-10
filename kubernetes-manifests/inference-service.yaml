@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: inference-container
-        image: your-inference-image:tag
+        image: prabhupad26/sa_analytics_inference
         ports:
         - containerPort: 5000  # Port for Flask app
 ---

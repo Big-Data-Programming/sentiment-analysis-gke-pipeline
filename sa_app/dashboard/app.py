@@ -6,6 +6,7 @@ import torch
 import yaml
 from sa_app.inference.inference import InferenceEngine
 from tqdm import tqdm
+import requests
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Can't initialize NVML")
 
@@ -37,8 +38,18 @@ def initialize_inference_model():
     return config, device_in_use, ie_obj
 
 
-def get_sentiment():
-    pass
+def get_sentiment(tweet_text):
+    inference_url = "http://inference-service:5000"
+    params = {
+        "id": 123,
+        "tweet_content": tweet_text
+    }
+    response = requests.get(inference_url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        return data['result']
+    else:
+        print(f"Request failed with status code {response.status_code}")
 
 
 config, device_in_use, ie_obj = initialize_inference_model()
@@ -71,7 +82,6 @@ placeholder = st.empty()
 df_iterator = get_data_iterator()
 tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0}
-sentiment_cnt_actual = {"positive": 0, "negative": 0}
 
 pbar = tqdm(desc="Processing tweets", total=cal_df_len)
 
@@ -83,35 +93,32 @@ for seconds in range(200):
 
         for _, row in df.iterrows():
             if row[5]:
-                sentiment_pred = ie_obj.perform_inference(row[5])
-                actual = ie_obj.label_mapping[row[0]]
+                sentiment_pred = get_sentiment(row[5])
                 tweet_count += 1
 
-                sentiment_cnt[sentiment_pred] += 1
-                sentiment_cnt_actual[actual] += 1
+                if sentiment_pred is not None:
+                    sentiment_cnt[sentiment_pred] += 1
 
-                with placeholder.container():
-                    # create three columns
-                    kpi1, kpi2, kpi3 = st.columns(3)
+                    with placeholder.container():
+                        # create three columns
+                        kpi1, kpi2, kpi3 = st.columns(3)
 
-                    # fill in those three columns with respective metrics or KPIs
-                    kpi1.metric(
-                        label="Total tweets",
-                        value=tweet_count,
-                        delta=tweet_count,
-                    )
+                        # fill in those three columns with respective metrics or KPIs
+                        kpi1.metric(
+                            label="Total tweets",
+                            value=tweet_count,
+                            delta=tweet_count,
+                        )
 
-                    kpi2.metric(
-                        label="Positive Count",
-                        value=sentiment_cnt["positive"],
-                        delta=-sentiment_cnt_actual["positive"],
-                    )
+                        kpi2.metric(
+                            label="Positive Count",
+                            value=sentiment_cnt["positive"]
+                        )
 
-                    kpi3.metric(
-                        label="Negative Count",
-                        value=sentiment_cnt["negative"],
-                        delta=sentiment_cnt_actual["negative"],
-                    )
+                        kpi3.metric(
+                            label="Negative Count",
+                            value=sentiment_cnt["negative"]
+                        )
             # time.sleep(1)
 
         pbar.update(len(df))
