@@ -2,6 +2,8 @@ name: Publish sa_app to pypi repository
 
 on:
   push:
+    paths:
+      - sa_app/src/pyproject.toml
     branches:
       - develop
 
