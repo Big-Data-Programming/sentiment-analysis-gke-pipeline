@@ -2,7 +2,7 @@ name: Build and Publish Frontend Docker Image
 on:
   push:
     paths:
-      -./sa_app/dashboard/Dockerfile_dashboard
+      - sa_app/dashboard/Dockerfile_dashboard
     branches:
       - main
 

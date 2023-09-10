@@ -2,7 +2,7 @@ name: Build and Publish Training Docker Image
 on:
   push:
     paths:
-      -./Dockerfile_training
+      - Dockerfile_training
     branches:
       - main
 
