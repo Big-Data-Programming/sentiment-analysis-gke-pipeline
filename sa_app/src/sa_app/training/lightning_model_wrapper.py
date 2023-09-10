@@ -7,7 +7,7 @@ import torch
 from sa_app.training.optmizer import LearningRateScheduler, Optimizer
 from torch.nn import CrossEntropyLoss
 from torchmetrics import Accuracy, MeanMetric, Metric
-from transformers import PreTrainedModel
+from transformers import AutoModelForSequenceClassification
 
 
 class Split(str, Enum):
@@ -22,7 +22,7 @@ class Split(str, Enum):
 class LightningModelWrapper(pl.LightningModule):
     def __init__(
         self,
-        model: PreTrainedModel,
+        model: AutoModelForSequenceClassification,
         optimizer_params: Optional[dict] = None,
         lr_scheduler_params: Optional[dict] = None,
         unique_config: Optional[dict] = None,
@@ -83,8 +83,11 @@ class LightningModelWrapper(pl.LightningModule):
 
         labels, sentence_batch = batch
         predicted_labels = torch.argmax(step_output.get("logits"), dim=1)
-        acc_fn(predicted_labels, labels)
-        self.log(f"{split_type}_acc_step", acc_fn, batch_size=self.trainer.train_dataloader.batch_size)
+        self.log(
+            f"{split_type}_acc_step",
+            acc_fn(predicted_labels, labels),
+            batch_size=self.trainer.train_dataloader.batch_size,
+        )
 
     def log_epoch_end(self, loss_fn: Metric, split_type: Split):
         loss_fn = loss_fn.compute() if loss_fn.mean_value != 0 else None
@@ -120,7 +123,7 @@ class LightningModelWrapper(pl.LightningModule):
         else:
             return optimizer
 
-    def sav(self, path: Union[str, Path]) -> None:
+    def save_model(self, path: Union[str, Path]) -> None:
         """Save the model using the original HF AutoModel.
 
         This is useful for when you'd like to export the model to the hub.

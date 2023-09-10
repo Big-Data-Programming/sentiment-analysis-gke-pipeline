@@ -1,0 +1,23 @@
+name: Build and Publish Docker Image
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Tag Docker image
+      run: |
+        docker build -t sa_analytics_dashboard -f sa_app/dashboard/Dockerfile_dashboard .
+        docker tag sa_analytics_dashboard prabhupad26/sa_analytics_dashboard:0.1
+
+    - name: Push Docker image to Docker Hub
+      run: docker push prabhupad26/sa_analytics_dashboard:0.1

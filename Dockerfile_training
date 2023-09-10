@@ -8,6 +8,6 @@ RUN pip install sa-app
 
 RUN python -m spacy download en_core_web_sm
 
-WORKDIR /container_src
+EXPOSE 5000
 
 CMD ["python", "-m", "sa_app.app", "--config", "/container_src/app_cfg.yml"]

@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", category=UserWarning, message="Can't initializ
 
 # Initialize streamlit
 st.set_page_config(
-    page_title="Real-Time Data Science Dashboard",
+    page_title="Twitter Data Sentiment Analysis Dashboard",
     page_icon="✅",
     layout="wide",
 )
@@ -23,7 +23,7 @@ def initialize_inference_model():
     # Initialize the sentiment analysis application
     config = yaml.safe_load(
         open(
-            "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/bdp2_apr22_exam-bdp2_apr22_group_2/sa_app/config_files/app_cfg.yml",
+            "container_src/app_cfg.yml",
             "r",
         )
     )
@@ -37,12 +37,14 @@ def initialize_inference_model():
     return config, device_in_use, ie_obj
 
 
+def get_sentiment():
+    pass
+
+
 config, device_in_use, ie_obj = initialize_inference_model()
 
 
-dataset_url = (
-    "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/sa_data_storage/training.1600000.processed.noemoticon.test.csv"
-)
+dataset_url = "container_src/sample.csv"
 
 
 # read csv from a URL

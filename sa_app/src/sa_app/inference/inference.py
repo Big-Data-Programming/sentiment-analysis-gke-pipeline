@@ -10,6 +10,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 class InferenceEngine:
     def __init__(self, inference_params: Dict, training_params: Dict, dataset_params: Dict, device: str):
+        # TODO : Download artifacts from wandb
         # Set the device to CPU or GPU
         self.device = device
 
