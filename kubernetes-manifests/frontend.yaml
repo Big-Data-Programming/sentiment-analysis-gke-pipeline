@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sa-app-dashboard
-        image: your-dashboard-image:tag
+        image: prabhupad26/sa_analytics_dashboard:latest
         ports:
         - containerPort: 8501  # Port for Streamlit app
 ---
@@ -29,3 +29,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8501  # Port for Streamlit app
+type: LoadBalancer
