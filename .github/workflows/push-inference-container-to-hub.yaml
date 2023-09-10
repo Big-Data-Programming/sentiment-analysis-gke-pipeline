@@ -2,7 +2,7 @@ name: Build and Publish Inference Docker Image
 on:
   push:
     paths:
-      - Dockerfile_inference
+      - Dockerfile_Inference
     branches:
       - main
 
