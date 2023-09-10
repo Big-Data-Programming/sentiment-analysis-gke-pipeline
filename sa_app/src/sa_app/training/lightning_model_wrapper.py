@@ -83,8 +83,11 @@ class LightningModelWrapper(pl.LightningModule):
 
         labels, sentence_batch = batch
         predicted_labels = torch.argmax(step_output.get("logits"), dim=1)
-        acc_fn(predicted_labels, labels)
-        self.log(f"{split_type}_acc_step", acc_fn, batch_size=self.trainer.train_dataloader.batch_size)
+        self.log(
+            f"{split_type}_acc_step",
+            acc_fn(predicted_labels, labels),
+            batch_size=self.trainer.train_dataloader.batch_size,
+        )
 
     def log_epoch_end(self, loss_fn: Metric, split_type: Split):
         loss_fn = loss_fn.compute() if loss_fn.mean_value != 0 else None

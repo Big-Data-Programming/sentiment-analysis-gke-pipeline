@@ -13,7 +13,7 @@ dataset_params:
     wandb_project_name: "sa-roberta"
     wandb_artifact_name: "sentiment-dataset"
     wandb_artifact_type: "training_dataset"
-    wandb_artifact_version: "latest"
+    wandb_artifact_version: "v1" # mention the specific version here
     training_file_type: "csv"
     labels_mapping_file_name: "mapping.txt"
   local_storage: # If wandb_storage is not defined the data artifacts referred from local path configured below
@@ -65,12 +65,18 @@ training_params:
     log_every_n_steps: 50
     val_check_interval: 5
     limit_val_batches: 2
+
+  wandb_storage:
+    artifact_name: "best_model_checkpoint"
+    artifact_type: "model"
+    register_to: "model-registry/sentiment-analysis-classifier"
+
   logging:
     log_dir: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/logs"
 
   callbacks:
     dirpath: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/logs/models"
-    monitor_var: 'train_loss_step'
+    monitor_var: 'valid_acc_step'
     monitor_var_mode: 'max'
     save_top_k: 1
 

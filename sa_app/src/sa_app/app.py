@@ -113,9 +113,14 @@ def train(config: dict, device: str, training_params: Dict, dataset_params: Dict
     # Initiate trainer
     trainer.fit(model=model_wrapped, train_dataloaders=train_dataset, val_dataloaders=valid_dataset, ckpt_path="last")
 
-    artifact = wandb.Artifact("best_model_checkpoint", type="trained-model")
-    artifact.add_file(callbacks[1].best_model_path)
-    wandb.run.log_artifact(artifact)
+    with wandb.init(project=dataset_params["wandb_storage"]["wandb_project_name"]) as run:
+        best_model = wandb.Artifact(
+            f"{training_params['wandb_storage']['artifact_name']}_{run.id}",
+            type=training_params["wandb_storage"]["artifact_type"],
+        )
+        best_model.add_file(callbacks[1].best_model_path)
+        run.log_artifact(best_model)
+        run.link_artifact(best_model, training_params["wandb_storage"]["register_to"])
 
     wandb.finish()
 
