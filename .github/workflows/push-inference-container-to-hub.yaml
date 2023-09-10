@@ -1,0 +1,25 @@
+name: Build and Publish Inference Docker Image
+on:
+  push:
+    paths:
+      -./Dockerfile_inference
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Tag Docker image
+      run: |
+        docker build -t sa_analytics_inference -f Dockerfile_inference .
+        docker tag sa_analytics_inference prabhupad26/sa_analytics_inference:0.1
+
+    - name: Push Docker image to Docker Hub
+      run: docker push prabhupad26/sa_analytics_inference:0.1
