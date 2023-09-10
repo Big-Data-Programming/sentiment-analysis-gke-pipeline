@@ -11,4 +11,3 @@ RUN python -m spacy download en_core_web_sm
 EXPOSE 5000
 
 CMD ["python", "-m", "sa_app.app", "--config", "/container_src/app_cfg.yml"]
-

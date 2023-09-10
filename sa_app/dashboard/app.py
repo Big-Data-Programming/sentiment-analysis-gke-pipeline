@@ -1,12 +1,12 @@
 import warnings
 
 import pandas as pd  # read csv, df manipulation
+import requests
 import streamlit as st  # 🎈 data web app development
 import torch
 import yaml
 from sa_app.inference.inference import InferenceEngine
 from tqdm import tqdm
-import requests
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Can't initialize NVML")
 
@@ -40,14 +40,11 @@ def initialize_inference_model():
 
 def get_sentiment(tweet_text):
     inference_url = "http://inference-service:5000"
-    params = {
-        "id": 123,
-        "tweet_content": tweet_text
-    }
+    params = {"id": 123, "tweet_content": tweet_text}
     response = requests.get(inference_url, params=params)
     if response.status_code == 200:
         data = response.json()
-        return data['result']
+        return data["result"]
     else:
         print(f"Request failed with status code {response.status_code}")
 
@@ -110,15 +107,9 @@ for seconds in range(200):
                             delta=tweet_count,
                         )
 
-                        kpi2.metric(
-                            label="Positive Count",
-                            value=sentiment_cnt["positive"]
-                        )
+                        kpi2.metric(label="Positive Count", value=sentiment_cnt["positive"])
 
-                        kpi3.metric(
-                            label="Negative Count",
-                            value=sentiment_cnt["negative"]
-                        )
+                        kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
             # time.sleep(1)
 
         pbar.update(len(df))
