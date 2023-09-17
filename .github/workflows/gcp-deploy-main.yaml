@@ -20,7 +20,9 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
 
     - name: Authenticate with GKE cluster
-      run: gcloud container clusters get-credentials ${{ vars.YOUR_CLUSTER_NAME }} --zone ${{ vars.YOUR_CLUSTER_ZONE}} --project ${{ secrets.GCP_PROJECT_ID }}
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
+        gcloud container clusters get-credentials ${{ vars.YOUR_CLUSTER_NAME }} --zone ${{ vars.YOUR_CLUSTER_ZONE}} --project ${{ secrets.GCP_PROJECT_ID }}
 
     - name: Deploy to GKE cluster
       run: |
