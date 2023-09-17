@@ -2,7 +2,7 @@ name: Build and Publish Frontend Docker Image
 on:
   push:
     paths:
-      - sa_app/dashboard/Dockerfile_dashboard
+      - sa_app/dashboard/
     branches:
       - main
 
@@ -22,4 +22,4 @@ jobs:
         docker tag sa_analytics_dashboard prabhupad26/sa_analytics_dashboard:0.1
 
     - name: Push Docker image to Docker Hub
-      run: docker push prabhupad26/sa_analytics_dashboard:0.1
+      run: docker push prabhupad26/sa_analytics_dashboard:0.2

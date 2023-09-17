@@ -1,7 +1,4 @@
 streamlit
 plotly
 pandas
-spacy
-sa_app
-torch
 PyYAML
