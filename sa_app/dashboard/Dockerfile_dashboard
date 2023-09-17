@@ -10,7 +10,6 @@ COPY sa_app/dashboard/sample.csv container_src/
 
 RUN pip install -r container_src/requirements.txt
 
-RUN python -m spacy download en_core_web_sm
 
 EXPOSE 8501
 
