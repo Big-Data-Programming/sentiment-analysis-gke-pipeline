@@ -3,9 +3,6 @@ import warnings
 import pandas as pd  # read csv, df manipulation
 import requests
 import streamlit as st  # 🎈 data web app development
-import torch
-import yaml
-from sa_app.inference.inference import InferenceEngine
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Can't initialize NVML")
@@ -19,25 +16,6 @@ st.set_page_config(
 )
 
 
-@st.cache_data
-def initialize_inference_model():
-    # Initialize the sentiment analysis application
-    config = yaml.safe_load(
-        open(
-            "container_src/app_cfg.yml",
-            "r",
-        )
-    )
-    device_in_use = "cuda" if torch.cuda.is_available() else "cpu"
-    ie_obj = InferenceEngine(
-        inference_params=config["inference_params"],
-        training_params=config["training_params"],
-        dataset_params=config["dataset_params"],
-        device=device_in_use,
-    )
-    return config, device_in_use, ie_obj
-
-
 def get_sentiment(tweet_text):
     inference_url = "http://inference-service:5000"
     params = {"id": 123, "tweet_content": tweet_text}
@@ -47,9 +25,6 @@ def get_sentiment(tweet_text):
         return data["result"]
     else:
         print(f"Request failed with status code {response.status_code}")
-
-
-config, device_in_use, ie_obj = initialize_inference_model()
 
 
 dataset_url = "container_src/sample.csv"
