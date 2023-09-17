@@ -2,7 +2,8 @@ name: Build and Publish Training Docker Image
 on:
   push:
     paths:
-      - Dockerfile_training
+      - sa_app/src/pyproject.toml
+      - sa_app/config_files/app_cfg.yml
     branches:
       - main
 

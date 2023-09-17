@@ -14,9 +14,12 @@ spec:
     spec:
       containers:
       - name: inference-container
-        image: your-inference-image:tag
+        image: prabhupad26/sa_analytics_inference:0.1
         ports:
         - containerPort: 5000  # Port for Flask app
+        env:
+        - name: WANDB_API_KEY
+          value: WANDB_API_KEY_VALUE
 ---
 apiVersion: v1
 kind: Service

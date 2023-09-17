@@ -20,7 +20,7 @@ ie_obj = InferenceEngine(
 def get_sentiment():
     new_tweet = {"id": request.json["id"], "tweet_content": request.json["tweet_content"]}
     # TODO : Insert to database
-    return jsonify(ie_obj.perform_inference(new_tweet["tweet_content"]))
+    return jsonify({"result": ie_obj.perform_inference(new_tweet["tweet_content"])})
 
 
 @app.route("/home")

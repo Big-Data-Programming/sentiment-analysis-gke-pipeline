@@ -1,4 +1,8 @@
-![example workflow](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/python-package-conda.yml/badge.svg)
+![pypi_upload](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/publish-to-pypi.yml/badge.svg)
+![docker_frontend](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/push-frontend-container-to-hub.yaml/badge.svg)
+![docker_inference](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/push-inference-container-to-hub.yaml/badge.svg)
+![docker_training](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/push-training-container-to-hub.yaml/badge.svg)
+![pytest](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/pytests-all-modules.yml/badge.svg)
 
 
 ## Installation
@@ -18,10 +22,10 @@
 ## Wandb cmds
 
 1. To upload a dataset make sure you have the data in you local, wandb account project created and then run the below cmd (you can also upload multiple files):
-   > Run `python sa_app/scripts/wandb_init.py --entity <you_user_name> --project <name of wandb project> --artifact_name <artifact name> --artifact_locations <artifact local path>`
-   > Example `python sa_app/scripts/wandb_init.py --entity prabhupad26 --project sa-roberta --artifact_name sentiment-dataset --artifact_locations sa_data_storage/training.1600000.processed.noemoticon.csv` 
+   * Run `python sa_app/scripts/wandb_init.py --entity <you_user_name> --project <name of wandb project> --artifact_name <artifact name> --artifact_locations <artifact local path>`
+   * Example `python sa_app/scripts/wandb_init.py --entity prabhupad26 --project sa-roberta --artifact_name sentiment-dataset --artifact_locations sa_data_storage/training.1600000.processed.noemoticon.csv` 
 2. To manually download the datasets run the below command with the desired file name:
-   > `wandb artifact get prabhupad26/sa-roberta/sentiment-dataset:latest --root training.1600000.processed.noemoticon.csv`
+   * `wandb artifact get prabhupad26/sa-roberta/sentiment-dataset:latest --root training.1600000.processed.noemoticon.csv`
 
 
 ## Run training
@@ -34,19 +38,21 @@ If running for the first time follow below steps :
 
 ## Build docker image
 
-1. Run this cmd from the root path of this repo : `docker build -t <name the image> .`
-2. -p 5000:5000
+Run below cmds from the root path of this repo
+1. `docker build -t <name the image> .`
+2. `docker run -p 5000:5000 <name of the image>`
 
 
 ## TODOS
 
-- [x] Add starter code
-- [x] Complete Training code
-- [x] Setup pre-commit
-- [ ] Add more data preprocessing steps
-- [ ] Create two containers :
-      - [ ] For training / inferencing via Flask API
-      - [ ] For dashboard APP deployment for GCP App engine.
-- [ ] Complete inference code in `sa_inference_module` : Add the flask API
-- [ ] Version control on dataset, model (Explore MLFlow) : Wandb articact upload code.
-- [ ] CI / CD (Devops)
+- [x] **Add Starter Code:** Initial codebase setup is complete.
+- [x] **Complete Training Code:** Training code for the model is implemented.
+- [x] **Setup Pre-commit:** Pre-commit hooks for code quality are configured.
+- [ ] **Add More Data Preprocessing Steps:** Additional data preprocessing steps are in progress.
+- [x] **Create Three Containers:**
+    - [x] **For Training via Flask API:** Container setup for training and inferencing is pending.
+    - [x] **For Inferencing via Flask API:** Container setup for training and inferencing is pending.
+    - [x] **For Dashboard APP Deployment for GCP App Engine:** Container setup for deploying the dashboard app is pending.
+- [x] **Complete Inference Code in `sa_inference_module`:** Flask API for inference is not yet implemented.
+- [ ] **Version Control on Dataset and Model:** Explore MLFlow integration for dataset and model versioning.
+- [ ] **CI / CD (DevOps):** Continuous Integration (CI) and Continuous Deployment (CD) setup is pending.
