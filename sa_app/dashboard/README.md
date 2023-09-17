@@ -4,5 +4,4 @@
 
 `docker build -t dashboard-app -f Dockerfile_dashboard .`
 
-
 `docker run -d -p 8501:8501 dashboard-app`
