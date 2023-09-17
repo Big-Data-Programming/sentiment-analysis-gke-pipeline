@@ -17,7 +17,7 @@ st.set_page_config(
 
 
 def get_sentiment(tweet_text):
-    inference_url = "http://inference-service:5000"
+    inference_url = "http://inference-service.default.svc.cluster.local:5000"
     params = {"id": 123, "tweet_content": tweet_text}
     response = requests.get(inference_url, params=params)
     if response.status_code == 200:
