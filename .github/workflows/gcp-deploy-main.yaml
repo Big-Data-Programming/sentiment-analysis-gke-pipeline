@@ -26,6 +26,5 @@ jobs:
 
     - name: Deploy to GKE cluster
       run: |
-        echo `ls`
         sed -i "s/WANDB_API_KEY_VALUE/${{ secrets.WANDB_API_KEY_VALUE }}/g" kubernetes-manifests/inference-service.yaml
         kubectl apply -f kubernetes-manifests/
