@@ -1,6 +1,6 @@
 name: Build and Publish Frontend Docker Image
 on:
-  push:
+  pull_request:
     paths:
       - sa_app/dashboard/*
     branches:

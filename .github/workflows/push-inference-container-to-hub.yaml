@@ -1,6 +1,6 @@
 name: Build and Publish Inference Docker Image
 on:
-  push:
+  pull_request:
     paths:
       - sa_app/src/pyproject.toml
       - sa_app/config_files/app_cfg.yml
