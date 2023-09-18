@@ -24,7 +24,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: inference-service
+  name: inference
 spec:
   selector:
     app: inference
