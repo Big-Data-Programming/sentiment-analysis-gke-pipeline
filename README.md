@@ -42,6 +42,10 @@ Run below cmds from the root path of this repo
 1. `docker build -t <name the image> .`
 2. `docker run -p 5000:5000 <name of the image>`
 
+## Workflow rules :
+For training :
+1. wildcard - `training/*` if matched will run the model-training workflow
+2. 
 
 ## TODOS
 
