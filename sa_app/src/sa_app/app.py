@@ -79,7 +79,7 @@ def get_trainer(
     return trainer
 
 
-def train(config: dict, device: str, training_params: Dict, dataset_params: Dict, seed: int, inference_params: Dict):
+def train(config: dict, device: list[str], training_params: Dict, dataset_params: Dict, seed: int, inference_params: Dict):
     # wandb login
     wandb.login(key=os.getenv("WANDB_API_KEY"))
 
@@ -97,13 +97,13 @@ def train(config: dict, device: str, training_params: Dict, dataset_params: Dict
         optimizer_params=training_params["optimizer"],
         lr_scheduler_params=training_params["lr_scheduler"] if "lr_scheduler" in training_params else None,
         unique_config=config,
-    )
+    ).to(device)
 
     # Get available devices
-    try:
+    if "cuda" in device:
         devices = [int(device.split(":")[-1])]
         accelerator = "gpu"
-    except ValueError:
+    else:
         devices = "auto"
         accelerator = "cpu"
 
@@ -129,6 +129,8 @@ def main():
     args = parse_args()
     config = yaml.safe_load(open(args.config, "r"))
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    if device == "cuda":
+        device = "cuda:3"
     if args.mode == "train":
         train(config=config, device=device, **config)
     else:
