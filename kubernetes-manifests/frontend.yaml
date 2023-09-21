@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: dashboard-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: dashboard
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sa-app-dashboard
-        image: prabhupad26/sa_analytics_dashboard:0.11
+        image: prabhupad26/sa_analytics_dashboard:0.12
         ports:
         - containerPort: 8501  # Port for Streamlit app
 ---
