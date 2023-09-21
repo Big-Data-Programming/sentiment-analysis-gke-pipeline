@@ -22,4 +22,3 @@ jobs:
       - name: Run Docker Container
         run: |
           gcloud compute ssh ${{ vars.TRAINING_VM_NAME}} --zone ${{ vars.TRAINING_ZONE }} --command "docker run -e WANDB_API_KEY=${{ secrets.WANDB_API_KEY_VALUE }} prabhupad26/sa_analytics_training"
-        continue-on-error: true
