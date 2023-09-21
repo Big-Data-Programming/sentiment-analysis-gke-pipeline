@@ -17,13 +17,14 @@ jobs:
       uses: google-github-actions/setup-gcloud@v0
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
 
     - name: Authenticate with GKE cluster
-      run: gcloud container clusters get-credentials $YOUR_CLUSTER_NAME --zone $YOUR_CLUSTER_ZONE --project ${{ secrets.GCP_PROJECT_ID }}
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
+        gcloud container clusters get-credentials ${{ vars.YOUR_CLUSTER_NAME }} --zone ${{ vars.YOUR_CLUSTER_ZONE}} --project ${{ secrets.GCP_PROJECT_ID }}
 
     - name: Deploy to GKE cluster
       run: |
         sed -i "s/WANDB_API_KEY_VALUE/${{ secrets.WANDB_API_KEY_VALUE }}/g" kubernetes-manifests/inference-service.yaml
-        kubectl apply -f kubernetes_manifests/
+        kubectl apply -f kubernetes-manifests/

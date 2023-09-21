@@ -14,9 +14,10 @@ spec:
     spec:
       containers:
       - name: inference-container
-        image: prabhupad26/sa_analytics_inference:0.1
+        image: prabhupad26/sa_analytics_inference:0.3
         ports:
-        - containerPort: 5000  # Port for Flask app
+          - containerPort: 5000  # Port for Flask app
+            name: http-port
         env:
         - name: WANDB_API_KEY
           value: WANDB_API_KEY_VALUE
@@ -30,4 +31,6 @@ spec:
     app: inference
   ports:
     - protocol: TCP
-      port: 5000  # Port for Flask app
+      port: 5001  # Port for Flask app
+      targetPort: 5000
+  type: LoadBalancer

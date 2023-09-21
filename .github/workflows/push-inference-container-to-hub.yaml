@@ -1,6 +1,6 @@
 name: Build and Publish Inference Docker Image
 on:
-  push:
+  pull_request:
     paths:
       - sa_app/src/pyproject.toml
       - sa_app/config_files/app_cfg.yml
@@ -20,7 +20,7 @@ jobs:
     - name: Build and Tag Docker image
       run: |
         docker build -t sa_analytics_inference -f Dockerfile_Inference .
-        docker tag sa_analytics_inference prabhupad26/sa_analytics_inference:0.1
+        docker tag sa_analytics_inference prabhupad26/sa_analytics_inference:0.3
 
     - name: Push Docker image to Docker Hub
-      run: docker push prabhupad26/sa_analytics_inference:0.1
+      run: docker push prabhupad26/sa_analytics_inference:0.3
