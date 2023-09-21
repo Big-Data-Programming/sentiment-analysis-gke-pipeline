@@ -17,9 +17,9 @@ st.set_page_config(
 
 
 def get_sentiment(tweet_text):
-    inference_url = "http://inference-service:5001"
-    params = {"id": 123, "tweet_content": tweet_text}
-    response = requests.get(inference_url, params=params)
+    inference_url = "http://inference-service:5001/sentiment_analysis"
+    data = {"id": 123, "tweet_content": tweet_text}
+    response = requests.post(inference_url, json=data)
     if response.status_code == 200:
         data = response.json()
         return data["result"]
