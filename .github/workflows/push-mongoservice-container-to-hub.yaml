@@ -19,7 +19,7 @@ jobs:
     - name: Build and Tag Docker image
       run: |
         docker build -t sa_analytics_mongo_service -f sa_app/mongo_service/Dockerfile .
-        docker tag sa_analytics_mongo_service prabhupad26/sa_analytics_mongo_service:0.1
+        docker tag sa_analytics_mongo_service prabhupad26/sa_analytics_mongo_service:0.2
 
     - name: Push Docker image to Docker Hub
-      run: docker push prabhupad26/sa_analytics_mongo_service:0.1
+      run: docker push prabhupad26/sa_analytics_mongo_service:0.2
