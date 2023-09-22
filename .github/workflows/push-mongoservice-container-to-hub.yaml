@@ -1,9 +1,8 @@
-name: Build and Publish Inference Docker Image
+name: Build and Publish Mongo Service Docker Image
 on:
   pull_request:
     paths:
-      - sa_app/src/pyproject.toml
-      - sa_app/config_files/app_cfg.yml
+      - sa_app/mongo_service/*
     branches:
       - main
 
@@ -19,8 +18,8 @@ jobs:
 
     - name: Build and Tag Docker image
       run: |
-        docker build -t sa_analytics_inference -f Dockerfile_Inference .
-        docker tag sa_analytics_inference prabhupad26/sa_analytics_inference:0.4
+        docker build -t sa_analytics_mongo_service -f sa_app/mongo_service/Dockerfile .
+        docker tag sa_analytics_mongo_service prabhupad26/sa_analytics_mongo_service:0.1
 
     - name: Push Docker image to Docker Hub
-      run: docker push prabhupad26/sa_analytics_inference:0.4
+      run: docker push prabhupad26/sa_analytics_mongo_service:0.1

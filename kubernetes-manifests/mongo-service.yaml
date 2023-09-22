@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-writer-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: writer-app
+  template:
+    metadata:
+      labels:
+        app: writer-app
+    spec:
+      containers:
+      - name: sa-app-dashboard
+        image: prabhupad26/sa_analytics_mongo_service:0.1
+        ports:
+        - containerPort: 5002  # Port for flask app
+        env:
+          - name: mongo_user
+            value: mongo_user_value
+          - name: mongo_pass
+            value: mongo_pass_value
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-writer-service
+spec:
+  selector:
+    app: writer-app
+  ports:
+    - protocol: TCP
+      port: 5002 # port where the service is listening
+      targetPort: 5002  # port where the pods are listening
+  type: ClusterIP

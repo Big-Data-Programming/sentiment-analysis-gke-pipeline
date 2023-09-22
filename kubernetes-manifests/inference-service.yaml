@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: inference-container
-        image: prabhupad26/sa_analytics_inference:0.3
+        image: prabhupad26/sa_analytics_inference:0.4
         ports:
           - containerPort: 5000  # Port for Flask app
             name: http-port
@@ -33,4 +33,4 @@ spec:
     - protocol: TCP
       port: 5001  # Port for Flask app
       targetPort: 5000
-  type: LoadBalancer
+  type: ClusterIP

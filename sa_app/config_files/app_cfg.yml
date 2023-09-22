@@ -54,15 +54,15 @@ training_params:
     lr_warmup: 0.1
 
   trainer:
-    max_steps: 10
+    max_steps: 100000
 #    max_epochs: 20
 #    accumulate_grad_batches: 1 # use when memory is not sufficient
     gradient_clip_val: 1
-    precision: bf16-mixed
-#    precision: 16-mixed
+    # precision: bf16-mixed
+    precision: 16-mixed
     log_every_n_steps: 50
-    val_check_interval: 5
-    limit_val_batches: 2
+    val_check_interval: 1000
+    limit_val_batches: 5000
 
   wandb_storage:
     artifact_name: "best_model_checkpoint"

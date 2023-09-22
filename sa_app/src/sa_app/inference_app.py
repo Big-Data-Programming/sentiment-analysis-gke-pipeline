@@ -1,3 +1,4 @@
+import requests
 import torch
 import yaml
 from flask import Flask, jsonify, request
@@ -19,8 +20,13 @@ ie_obj = InferenceEngine(
 @app.route("/sentiment_analysis", methods=["POST"])
 def get_sentiment():
     new_tweet = {"id": request.json["id"], "tweet_content": request.json["tweet_content"]}
-    # TODO : Insert to database
-    return jsonify({"result": ie_obj.perform_inference(new_tweet["tweet_content"])})
+    result_data = {"result": ie_obj.perform_inference(new_tweet["tweet_content"])}
+    db_update_status = requests.post(
+        "http://mongo-writer-service:5002/update_tweet_sentiment",
+        json={"id": new_tweet["id"], "sentiment_value": result_data["result"]},
+    )
+    result_data["db_update_status"] = db_update_status.status_code
+    return jsonify(result_data)
 
 
 @app.route("/home")

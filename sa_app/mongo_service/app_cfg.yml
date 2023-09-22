@@ -1,0 +1,7 @@
+#################
+# Database PARAMS #
+#################
+database_params:
+  host: cluster0.ft46f9k.mongodb.net/?retryWrites=true&w=majority
+  port: 27017
+  host_type: cloud
