@@ -1,0 +1,48 @@
+name: Run Docker on GCE
+
+on:
+  push:
+    branches:
+      - 'training/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Create GCE Instance
+        run: |
+          gcloud compute instances create my-instance \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --zone ${{ vars.TRAINING_ZONE}}
+            --machine-type=e2-medium \
+            --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
+            --maintenance-policy=TERMINATE \
+            --provisioning-model=STANDARD \
+            --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
+            --create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/debian-cloud/global/images/debian-11-bullseye-v20230912,mode=rw,size=10,type=projects/${{ secrets.GCP_PROJECT_ID }}/zones/${{ vars.TRAINING_ZONE}}/diskTypes/pd-balanced \
+            --no-shielded-secure-boot \
+            --shielded-vtpm \
+            --shielded-integrity-monitoring \
+            --labels=goog-ec-src=vm_add-gcloud \
+            --reservation-affinity=any
+
+        continue-on-error: true
+
+      - name: Run Docker Container
+        run: |
+          gcloud compute ssh my-instance --command "docker run -e WANDB_API_KEY=${{ secrets.WANDB_API_KEY_VALUE }} prabhupad26/sa_analytics_training"
+        continue-on-error: true
+
+      - name: Stop GCE Instance
+        run: |
+          gcloud compute instances stop my-instance --zone ${{ vars.TRAINING_ZONE}} --quiet
