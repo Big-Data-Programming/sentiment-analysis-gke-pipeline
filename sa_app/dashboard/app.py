@@ -27,10 +27,10 @@ def get_sentiment(tweet_text):
         print(f"Request failed with status code {response.status_code}")
 
 
-def insert_to_db(u_id, sentiment_value):
+def insert_to_db(u_id, tweet_content):
     if u_id is not None:
-        writer_url = "http://mongo-writer-service:5002/update_tweet_sentiment"
-        db_update_status = requests.post(writer_url, json={"u_id": u_id, "sentiment_value": sentiment_value})
+        writer_url = "http://mongo-writer-service:5002/insert_tweet_data"
+        db_update_status = requests.post(writer_url, json={"user_id": u_id, "tweet_content": tweet_content})
         if db_update_status.status_code == 200:
             return db_update_status.json()["result"]
         else:
