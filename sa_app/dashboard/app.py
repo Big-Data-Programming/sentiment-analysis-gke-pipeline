@@ -27,6 +27,19 @@ def get_sentiment(tweet_text):
         print(f"Request failed with status code {response.status_code}")
 
 
+def insert_to_db(u_id, sentiment_value):
+    if u_id is not None:
+        writer_url = "http://mongo-writer-service:5002/update_tweet_sentiment"
+        db_update_status = requests.post(writer_url, json={"u_id": u_id, "sentiment_value": sentiment_value})
+        if db_update_status.status_code == 200:
+            return db_update_status.json()["result"]
+        else:
+            print(f"Request failed with status code {db_update_status.status_code}")
+            return False
+    else:
+        print("Database update failed")
+
+
 dataset_url = "container_src/sample.csv"
 
 
@@ -65,7 +78,11 @@ for seconds in range(200):
 
         for _, row in df.iterrows():
             if row[5]:
+                # Inserting the tweet to database
+                u_id = insert_to_db(row[4], row[5])
+                # Run model inference here
                 sentiment_pred = get_sentiment(row[5])
+
                 tweet_count += 1
 
                 if sentiment_pred is not None:

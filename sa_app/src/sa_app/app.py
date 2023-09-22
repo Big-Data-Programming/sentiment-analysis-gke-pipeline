@@ -79,7 +79,9 @@ def get_trainer(
     return trainer
 
 
-def train(config: dict, device: list[str], training_params: Dict, dataset_params: Dict, seed: int, inference_params: Dict):
+def train(
+    config: dict, device: list[str], training_params: Dict, dataset_params: Dict, seed: int, inference_params: Dict
+):
     # wandb login
     wandb.login(key=os.getenv("WANDB_API_KEY"))
 

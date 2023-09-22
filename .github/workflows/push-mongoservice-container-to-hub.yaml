@@ -1,0 +1,25 @@
+name: Build and Publish Mongo Service Docker Image
+on:
+  pull_request:
+    paths:
+      - sa_app/mongo_service/*
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Tag Docker image
+      run: |
+        docker build -t sa_analytics_mongo_service -f sa_app/mongo_service/Dockerfile .
+        docker tag sa_analytics_mongo_service prabhupad26/sa_analytics_mongo_service:0.1
+
+    - name: Push Docker image to Docker Hub
+      run: docker push prabhupad26/sa_analytics_mongo_service:0.1
