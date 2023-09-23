@@ -56,11 +56,11 @@ def update_donut(sentiment_cnt_dict):
 
 
 # read csv from a URL
-# @st.cache_data
-def get_data_iterator(nrows) -> pd.DataFrame:
+@st.cache_data
+def get_data_iterator() -> pd.DataFrame:
     df = pd.read_csv(dataset_url)
     # pick n sampled rows
-    return df.sample(nrows)
+    return df
 
 
 # dashboard title
@@ -77,7 +77,7 @@ sentiment_cnt = {"positive": 0, "negative": 0}
 
 
 if collect_btn:
-    df_iterator = get_data_iterator(int(topic_limit))
+    df_iterator = get_data_iterator().sample(int(topic_limit))
     for _, row in df_iterator.iterrows():
         if row[5]:
             # Inserting the tweet to database
