@@ -65,7 +65,7 @@ def get_data_iterator(nrows) -> pd.DataFrame:
 # dashboard title
 st.title("Sentiment Analysis Dashboard")
 
-topic_limit = st.text_input(placeholder="Enter # of tweets to be analysed")
+topic_limit = st.text_input(label="Number of tweets to be analysed", placeholder="Enter # of tweets to be analysed")
 collect_btn = st.button("Start collecting")
 
 
@@ -73,10 +73,10 @@ collect_btn = st.button("Start collecting")
 placeholder = st.empty()
 tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0}
-df_iterator = get_data_iterator(int(topic_limit))
 
 
 if collect_btn:
+    df_iterator = get_data_iterator(int(topic_limit))
     for _, row in df_iterator.iterrows():
         if row[5]:
             # Inserting the tweet to database
