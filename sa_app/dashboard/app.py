@@ -40,7 +40,7 @@ def insert_to_db(u_id, tweet_content):
         print("Database update failed")
 
 
-dataset_url = "container_src/sample.csv"
+dataset_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp617o0JFqccSe3nDF90EyAtCwmshhtDfL-p4f60Gt63Fo2MEqrXWG2RIrN55RwmqRYFx16KsOPjR6/pub?gid=1359267733&single=true&output=csv"
 
 
 # read csv from a URL
@@ -55,8 +55,6 @@ df_iterator = get_data_iterator()
 st.title("Sentiment Analysis Dashboard")
 
 # top-level filters
-topic = st.text_input("Enter the topic you would like to do sentiment analysis on")
-tweet_limit = st.text_input("# of tweets")
 collect_btn = st.button("Start collecting")
 
 cal_df_len = get_data_iterator()
