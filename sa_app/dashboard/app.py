@@ -50,9 +50,9 @@ def update_donut(sentiment_cnt_dict):
     sentiment_data = pd.DataFrame(
         {"Sentiment": list(sentiment_cnt_dict.keys()), "Count": list(sentiment_cnt_dict.values())}
     )
-    fig = px.pie(sentiment_data, names="Sentiment", values="Count", hole=0.5)
+    fig = px.pie(sentiment_data, names="Sentiment", values="Count", hole=0.5, color_discrete_sequence=["blue", "red"])
     fig.update_traces(textinfo="percent+label", pull=[0.2, 0])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=False)
 
 
 # read csv from a URL
