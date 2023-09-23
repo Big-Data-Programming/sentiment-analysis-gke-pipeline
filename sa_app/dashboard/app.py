@@ -16,9 +16,9 @@ st.set_page_config(
 )
 
 
-def get_sentiment(tweet_text):
+def get_sentiment(u_id, tweet_text):
     inference_url = "http://inference-service:5001/sentiment_analysis"
-    data = {"id": 123, "tweet_content": tweet_text}
+    data = {"id": u_id, "tweet_content": tweet_text}
     response = requests.post(inference_url, json=data)
     if response.status_code == 200:
         data = response.json()
@@ -82,7 +82,7 @@ if collect_btn:
                     # Inserting the tweet to database
                     u_id = insert_to_db(row[4], row[5])
                     # Run model inference here
-                    sentiment_pred = get_sentiment(row[5])
+                    sentiment_pred = get_sentiment(u_id, row[5])
 
                     tweet_count += 1
 
