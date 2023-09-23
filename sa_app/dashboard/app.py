@@ -52,14 +52,15 @@ def update_donut(sentiment_cnt_dict):
     )
     fig = px.pie(sentiment_data, names="Sentiment", values="Count", hole=0.5)
     fig.update_traces(textinfo="percent+label", pull=[0.2, 0])
-    chart_placeholder = st.plotly_chart(fig, use_container_width=True)
-    chart_placeholder.line_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 # read csv from a URL
-# @st.cache_data
-def get_data_iterator(nrows) -> pd.DataFrame:
-    return pd.read_csv(dataset_url, nrows=nrows)
+@st.cache_data
+def get_data_iterator() -> pd.DataFrame:
+    df = pd.read_csv(dataset_url)
+    # pick n sampled rows
+    return df
 
 
 # dashboard title
@@ -76,7 +77,7 @@ sentiment_cnt = {"positive": 0, "negative": 0}
 
 
 if collect_btn:
-    df_iterator = get_data_iterator(int(topic_limit))
+    df_iterator = get_data_iterator().sample(int(topic_limit))
     for _, row in df_iterator.iterrows():
         if row[5]:
             # Inserting the tweet to database
@@ -104,5 +105,4 @@ if collect_btn:
 
                     kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
 
-                    update_donut(sentiment_cnt)
-        # time.sleep(1)
+update_donut(sentiment_cnt)
