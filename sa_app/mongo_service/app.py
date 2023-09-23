@@ -4,7 +4,7 @@ from tweet_collection import service_insert_twitter_data, service_update_sentime
 from utils import mongo_global_init
 
 app = Flask(__name__)
-config = yaml.safe_load(open("app_cfg.yml", "r"))
+config = yaml.safe_load(open("container_src/app_cfg.yml", "r"))
 mongo_global_init(**config["database_params"])
 
 

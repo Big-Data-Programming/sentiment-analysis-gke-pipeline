@@ -23,7 +23,7 @@ def get_sentiment():
     result_data = {"result": ie_obj.perform_inference(new_tweet["tweet_content"])}
     db_update_status = requests.post(
         "http://mongo-writer-service:5002/update_tweet_sentiment",
-        json={"id": new_tweet["id"], "sentiment_value": result_data["result"]},
+        json={"u_id": new_tweet["id"], "sentiment_value": result_data["result"]},
     )
     result_data["db_update_status"] = db_update_status.status_code
     return jsonify(result_data)
