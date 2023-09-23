@@ -1,9 +1,9 @@
 import warnings
 
 import pandas as pd  # read csv, df manipulation
+import plotly.express as px
 import requests
 import streamlit as st  # 🎈 data web app development
-from tqdm import tqdm
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Can't initialize NVML")
 
@@ -40,73 +40,69 @@ def insert_to_db(u_id, tweet_content):
         print("Database update failed")
 
 
-dataset_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp617o0JFqccSe3nDF90EyAtCwmshhtDfL-p4f60Gt63Fo2MEqrXWG2RIrN55RwmqRYFx16KsOPjR6/pub?gid=1359267733&single=true&output=csv"
+dataset_url = (
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp617o0JFqccSe3nDF90EyAtCwmshhtDfL"
+    "-p4f60Gt63Fo2MEqrXWG2RIrN55RwmqRYFx16KsOPjR6/pub?gid=1359267733&single=true&output=csv"
+)
+
+
+def update_donut(sentiment_cnt_dict):
+    sentiment_data = pd.DataFrame(
+        {"Sentiment": list(sentiment_cnt_dict.keys()), "Count": list(sentiment_cnt_dict.values())}
+    )
+    fig = px.pie(sentiment_data, names="Sentiment", values="Count", hole=0.5)
+    fig.update_traces(textinfo="percent+label", pull=[0.2, 0])
+    chart_placeholder = st.plotly_chart(fig, use_container_width=True)
+    chart_placeholder.line_chart(fig)
 
 
 # read csv from a URL
 # @st.cache_data
-def get_data_iterator() -> pd.DataFrame:
-    return pd.read_csv(dataset_url, chunksize=1000)
+def get_data_iterator(nrows) -> pd.DataFrame:
+    return pd.read_csv(dataset_url, nrows=nrows)
 
-
-df_iterator = get_data_iterator()
 
 # dashboard title
 st.title("Sentiment Analysis Dashboard")
 
-# top-level filters
+topic_limit = st.text_input(placeholder="Enter # of tweets to be analysed")
 collect_btn = st.button("Start collecting")
 
-cal_df_len = get_data_iterator()
-cal_df_len = sum([len(df) for df in cal_df_len])
 
 # creating a single-element container
 placeholder = st.empty()
-
-# dataframe filter
-df_iterator = get_data_iterator()
 tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0}
+df_iterator = get_data_iterator(int(topic_limit))
 
-pbar = tqdm(desc="Processing tweets", total=cal_df_len)
 
 if collect_btn:
-    # near real-time / live feed simulation
-    for seconds in range(200):
-        try:
-            df = next(df_iterator)
-            # df = df[df.iloc[:, 4] == job_filter]
+    for _, row in df_iterator.iterrows():
+        if row[5]:
+            # Inserting the tweet to database
+            u_id = insert_to_db(row[4], row[5])
+            # Run model inference here
+            sentiment_pred = get_sentiment(u_id, row[5])
 
-            for _, row in df.iterrows():
-                if row[5]:
-                    # Inserting the tweet to database
-                    u_id = insert_to_db(row[4], row[5])
-                    # Run model inference here
-                    sentiment_pred = get_sentiment(u_id, row[5])
+            tweet_count += 1
 
-                    tweet_count += 1
+            if sentiment_pred is not None:
+                sentiment_cnt[sentiment_pred] += 1
 
-                    if sentiment_pred is not None:
-                        sentiment_cnt[sentiment_pred] += 1
+                with placeholder.container():
+                    # create three columns
+                    kpi1, kpi2, kpi3 = st.columns(3)
 
-                        with placeholder.container():
-                            # create three columns
-                            kpi1, kpi2, kpi3 = st.columns(3)
+                    # fill in those three columns with respective metrics or KPIs
+                    kpi1.metric(
+                        label="Total tweets",
+                        value=tweet_count,
+                        delta=tweet_count,
+                    )
 
-                            # fill in those three columns with respective metrics or KPIs
-                            kpi1.metric(
-                                label="Total tweets",
-                                value=tweet_count,
-                                delta=tweet_count,
-                            )
+                    kpi2.metric(label="Positive Count", value=sentiment_cnt["positive"])
 
-                            kpi2.metric(label="Positive Count", value=sentiment_cnt["positive"])
+                    kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
 
-                            kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
-                # time.sleep(1)
-
-            pbar.update(len(df))
-
-        except StopIteration:
-            print("No more tweets!!!!")
-            break
+                    update_donut(sentiment_cnt)
+        # time.sleep(1)
