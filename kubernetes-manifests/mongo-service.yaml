@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sa-app-dashboard
-        image: prabhupad26/sa_analytics_mongo_service:0.2
+        image: prabhupad26/sa_analytics_mongo_service:0.3
         ports:
         - containerPort: 5002  # Port for flask app
         env:
