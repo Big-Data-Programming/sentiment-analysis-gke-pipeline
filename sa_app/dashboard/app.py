@@ -52,10 +52,12 @@ def get_data_iterator() -> pd.DataFrame:
 df_iterator = get_data_iterator()
 
 # dashboard title
-st.title("Real-Time / Live Data Science Dashboard")
+st.title("Sentiment Analysis Dashboard")
 
 # top-level filters
-job_filter = st.selectbox("Select topic", [pd.unique(df.iloc[:, 4]) for df in df_iterator][0])
+topic = st.text_input("Enter the topic you would like to do sentiment analysis on")
+tweet_limit = st.text_input("# of tweets")
+collect_btn = st.button("Start collecting")
 
 cal_df_len = get_data_iterator()
 cal_df_len = sum([len(df) for df in cal_df_len])
@@ -70,42 +72,43 @@ sentiment_cnt = {"positive": 0, "negative": 0}
 
 pbar = tqdm(desc="Processing tweets", total=cal_df_len)
 
-# near real-time / live feed simulation
-for seconds in range(200):
-    try:
-        df = next(df_iterator)
-        # df = df[df.iloc[:, 4] == job_filter]
+if collect_btn:
+    # near real-time / live feed simulation
+    for seconds in range(200):
+        try:
+            df = next(df_iterator)
+            # df = df[df.iloc[:, 4] == job_filter]
 
-        for _, row in df.iterrows():
-            if row[5]:
-                # Inserting the tweet to database
-                u_id = insert_to_db(row[4], row[5])
-                # Run model inference here
-                sentiment_pred = get_sentiment(row[5])
+            for _, row in df.iterrows():
+                if row[5]:
+                    # Inserting the tweet to database
+                    u_id = insert_to_db(row[4], row[5])
+                    # Run model inference here
+                    sentiment_pred = get_sentiment(row[5])
 
-                tweet_count += 1
+                    tweet_count += 1
 
-                if sentiment_pred is not None:
-                    sentiment_cnt[sentiment_pred] += 1
+                    if sentiment_pred is not None:
+                        sentiment_cnt[sentiment_pred] += 1
 
-                    with placeholder.container():
-                        # create three columns
-                        kpi1, kpi2, kpi3 = st.columns(3)
+                        with placeholder.container():
+                            # create three columns
+                            kpi1, kpi2, kpi3 = st.columns(3)
 
-                        # fill in those three columns with respective metrics or KPIs
-                        kpi1.metric(
-                            label="Total tweets",
-                            value=tweet_count,
-                            delta=tweet_count,
-                        )
+                            # fill in those three columns with respective metrics or KPIs
+                            kpi1.metric(
+                                label="Total tweets",
+                                value=tweet_count,
+                                delta=tweet_count,
+                            )
 
-                        kpi2.metric(label="Positive Count", value=sentiment_cnt["positive"])
+                            kpi2.metric(label="Positive Count", value=sentiment_cnt["positive"])
 
-                        kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
-            # time.sleep(1)
+                            kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
+                # time.sleep(1)
 
-        pbar.update(len(df))
+            pbar.update(len(df))
 
-    except StopIteration:
-        print("No more tweets!!!!")
-        break
+        except StopIteration:
+            print("No more tweets!!!!")
+            break
