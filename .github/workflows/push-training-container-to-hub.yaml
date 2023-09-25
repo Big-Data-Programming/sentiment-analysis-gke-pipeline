@@ -20,7 +20,7 @@ jobs:
     - name: Build and Tag Docker image
       run: |
         docker build -t sa_analytics_training -f Dockerfile_training .
-        docker tag sa_analytics_training prabhupad26/sa_analytics_training:0.2
+        docker tag sa_analytics_training prabhupad26/sa_analytics_training:0.3
 
     - name: Push Docker image to Docker Hub
-      run: docker push prabhupad26/sa_analytics_training:0.2
+      run: docker push prabhupad26/sa_analytics_training:0.3

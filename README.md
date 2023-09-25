@@ -58,6 +58,6 @@ For training :
     - [x] **For Inferencing via Flask API:** Container setup for training and inferencing is pending.
     - [x] **For Dashboard APP Deployment for GCP App Engine:** Container setup for deploying the dashboard app is pending.
 - [x] **Complete Inference Code in `sa_inference_module`:** Flask API for inference is not yet implemented.
-- [ ] **Version Control on Dataset and Model:** Explore MLFlow integration for dataset and model versioning.
-- [ ] **CI / CD (DevOps):** Continuous Integration (CI) and Continuous Deployment (CD) setup is pending.
+- [x] **Version Control on Dataset and Model:** Explore MLFlow integration for dataset and model versioning.
+- [x] **CI / CD (DevOps):** Continuous Integration (CI) and Continuous Deployment (CD) setup is pending.
   - [ ] **Maintain the version of containers in a single file** : currently it is being updated in multiple files (.github/workflows and kubernetes-manifest)
