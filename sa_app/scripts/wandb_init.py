@@ -57,4 +57,10 @@ if __name__ == "__main__":
     wandb.login()
     args = parse_args()
     print("Uploading dataset")
-    upload_artifact(entity=args.entity, project=args.project, artifact_locations=args.artifact_locations)
+    upload_artifact(
+        entity=args.entity,
+        project=args.project,
+        artifact_name=args.artifact_name,
+        artifact_type=args.artifact_type,
+        artifact_locations=args.artifact_locations,
+    )

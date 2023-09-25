@@ -3,3 +3,4 @@ plotly
 pandas
 PyYAML
 tqdm
+tweepy
