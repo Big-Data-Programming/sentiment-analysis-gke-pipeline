@@ -83,7 +83,7 @@ if collect_btn:
             u_id = insert_to_db(row[4], row[5])
             # Run model inference here
             sentiment_pred = get_sentiment(u_id, row[5])
-
+            print(f"For {row[5]}, prediction is : {sentiment_pred}")
             tweet_count += 1
 
             if sentiment_pred is not None:
@@ -104,19 +104,7 @@ if collect_btn:
 
                     kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
 
-                    if sentiment_pred == "positive":
-                        text_color = "darkblue"
-                    elif sentiment_pred == "negative":
-                        text_color = "red"
-                    else:
-                        text_color = "black"
-
-                    tweet_text = f'<span style="color:{text_color};">{row[5]}</span>'
-
-                    results.append([tweet_text, sentiment_pred, row[0]])
+                    results.append([row[5], sentiment_pred, row[0]])
 
 update_donut(sentiment_cnt)
-for result in results:
-    st.markdown(result[0], unsafe_allow_html=True)
-    st.write("Sentiment:", result[1])
-    st.write("sentiment_label:", result[2])
+st.table(results)
