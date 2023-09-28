@@ -113,7 +113,10 @@ if collect_btn:
 
                     tweet_text = f'<span style="color:{text_color};">{row[5]}</span>'
 
-                    results.append([tweet_text, sentiment_pred])
+                    results.append([tweet_text, sentiment_pred, row[0]])
 
 update_donut(sentiment_cnt)
-st.table(results)
+for result in results:
+    st.markdown(result[0], unsafe_allow_html=True)
+    st.write("Sentiment:", result[1])
+    st.write("sentiment_label:", result[2])
