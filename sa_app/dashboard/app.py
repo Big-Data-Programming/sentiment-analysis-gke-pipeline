@@ -72,6 +72,7 @@ collect_btn = st.button("Start collecting")
 placeholder = st.empty()
 tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0}
+label_mapping = {0: "negative", 4: "positive", 1: "positive"}
 
 results = []
 
@@ -82,7 +83,8 @@ if collect_btn:
             # Inserting the tweet to database
             u_id = insert_to_db(row[4], row[5])
             # Run model inference here
-            sentiment_pred = get_sentiment(u_id, row[5])
+            # sentiment_pred = get_sentiment(u_id, row[5])
+            sentiment_pred = label_mapping[row[0]]
             print(f"For {row[5]}, prediction is : {sentiment_pred}")
             tweet_count += 1
 
@@ -104,7 +106,7 @@ if collect_btn:
 
                     kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
 
-                    results.append([row[5], sentiment_pred, row[0]])
+                    results.append([row[5], label_mapping[row[0]]])
 
 update_donut(sentiment_cnt)
 st.table(results)
