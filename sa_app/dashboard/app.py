@@ -7,7 +7,6 @@ import streamlit as st  # 🎈 data web app development
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Can't initialize NVML")
 
-
 # Initialize streamlit
 st.set_page_config(
     page_title="Twitter Data Sentiment Analysis Dashboard",
@@ -69,12 +68,12 @@ st.title("Sentiment Analysis Dashboard")
 topic_limit = st.text_input(label="Number of tweets to be analysed", placeholder="Enter # of tweets to be analysed")
 collect_btn = st.button("Start collecting")
 
-
 # creating a single-element container
 placeholder = st.empty()
 tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0}
 
+results = []
 
 if collect_btn:
     df_iterator = get_data_iterator().sample(int(topic_limit))
@@ -105,4 +104,16 @@ if collect_btn:
 
                     kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
 
+                    if sentiment_pred == "positive":
+                        text_color = "darkblue"
+                    elif sentiment_pred == "negative":
+                        text_color = "red"
+                    else:
+                        text_color = "black"
+
+                    tweet_text = f'<span style="color:{text_color};">{row[5]}</span>'
+
+                    results.append([tweet_text, sentiment_pred])
+
 update_donut(sentiment_cnt)
+st.table(results)
