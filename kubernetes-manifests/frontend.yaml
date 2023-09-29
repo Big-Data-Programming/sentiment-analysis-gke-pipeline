@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sa-app-dashboard
-        image: prabhupad26/sa_analytics_dashboard:0.26
+        image: prabhupad26/sa_analytics_dashboard:0.27
         ports:
         - containerPort: 8501  # Port for Streamlit app
 ---
