@@ -85,7 +85,7 @@ if collect_btn:
             # Run model inference here
             # sentiment_pred = get_sentiment(u_id, row[5])
             sentiment_pred = label_mapping[row[0]]
-            print(f"For {row[5]}, prediction is : {sentiment_pred}")
+            # print(f"For {row[5]}, prediction is : {sentiment_pred}")
             tweet_count += 1
 
             if sentiment_pred is not None:
