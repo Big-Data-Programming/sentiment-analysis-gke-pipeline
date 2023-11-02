@@ -59,6 +59,14 @@ Run below cmds from the root path of this repo
 For training :
 1. wildcard - `training/*` if matched will run the model-training workflow
 
+## Screenshots from the frontend : 
+
+![image](https://github.com/Big-Data-Programming/sentiment-analysis-gke-pipeline/assets/11462012/3af9ef04-2054-4432-885c-ecea6f191dbc)
+
+![image (1)](https://github.com/Big-Data-Programming/sentiment-analysis-gke-pipeline/assets/11462012/4327d904-e2f4-4877-9260-51cfe05badab)
+
+
+
 ## TODOS
 
 - [x] **Add Starter Code:** Initial codebase setup is complete.
