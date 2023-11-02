@@ -4,6 +4,15 @@
 ![docker_training](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/push-training-container-to-hub.yaml/badge.svg)
 ![pytest](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/pytests-all-modules.yml/badge.svg)
 
+## Architecture Overview
+
+#### Block diagram to show the internal working of this project
+![Untitled Diagram-Page-2 (1)](https://github.com/Big-Data-Programming/sentiment-analysis-gke-pipeline/assets/11462012/874ffd59-e90e-4197-9519-6385c00033f8)
+
+
+#### Block diagram to show the github action automation to establish the CI/CD pipeline
+![Big Data Programming 2](https://github.com/Big-Data-Programming/sentiment-analysis-gke-pipeline/assets/11462012/b58b962a-aa46-4706-be10-3ac8317b5a55)
+
 
 ## Installation
 
