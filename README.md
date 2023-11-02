@@ -4,6 +4,10 @@
 ![docker_training](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/push-training-container-to-hub.yaml/badge.svg)
 ![pytest](https://github.com/Big-Data-Programming/bdp2_apr22_exam-bdp2_apr22_group_2/actions/workflows/pytests-all-modules.yml/badge.svg)
 
+## A fully GKE managed Sentiment analysis application with language model training and inference schemes automated using github actions
+
+
+
 ## Architecture Overview
 
 #### Block diagram to show the internal working of this project
@@ -54,7 +58,6 @@ Run below cmds from the root path of this repo
 ## Workflow rules :
 For training :
 1. wildcard - `training/*` if matched will run the model-training workflow
-2. 
 
 ## TODOS
 
