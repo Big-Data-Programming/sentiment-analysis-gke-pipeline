@@ -58,7 +58,21 @@ class LemmaPreprocessor(BasePreprocessor):
         return " ".join([token.lemma_ for token in self.spacy_model(text)])
 
 
-# TODO: Add more preprocessing steps
+class ModelSpecificPreprocessor(BasePreprocessor):
+    def __call__(self, text: str) -> str:
+        """
+        Basic cleaning :
+            1. replaces mentions with generic placeholder - @user
+            2. replaces urls with generic placeholder - http
+        :param text: input string
+        :return: str
+        """
+        new_text = []
+        for t in text.split(" "):
+            t = "@user" if t.startswith("@") and len(t) > 1 else t
+            t = "http" if t.startswith("http") else t
+            new_text.append(t)
+        return " ".join(new_text)
 
 
 class StackedPreprocessor(BasePreprocessor):
@@ -66,7 +80,9 @@ class StackedPreprocessor(BasePreprocessor):
         if preprocessors is None:
             preprocessors = {}
 
-        self.preprocessors = [PREPROCESSORS[name](**params) for name, params in preprocessors.items()]
+        self.preprocessors = [
+            PREPROCESSORS[name](**params) for name, params in preprocessors.items()
+        ]
 
     def __call__(self, text_batch: List[str]) -> List[str]:
         processed_batch = []
@@ -82,4 +98,5 @@ PREPROCESSORS = {
     "lowcase": MakeLowerCasePreprocessor,
     "stem": StemPreprocessor,
     "lemma": LemmaPreprocessor,
+    "cardiffnlp_processor": ModelSpecificPreprocessor,
 }
