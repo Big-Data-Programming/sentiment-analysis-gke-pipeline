@@ -4,13 +4,12 @@ from typing import Dict, Generator, List, Optional, Tuple
 
 import pandas as pd
 import torch
+import wandb
 from sa_app.data.data_cleaner import StackedPreprocessor
 from sa_app.data.kaggle_dataset import get_dataset_length, get_file_names, split_dataset
 from torch.utils.data import IterableDataset
 from tqdm import tqdm
 from transformers import AutoTokenizer
-
-import wandb
 
 
 def kaggle_dataset_iterator(file_map: dict, chunk_size=1000, split_type="train") -> pd.DataFrame:

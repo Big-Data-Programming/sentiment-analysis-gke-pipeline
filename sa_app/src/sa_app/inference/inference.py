@@ -2,6 +2,7 @@ import os
 from typing import Dict
 
 import torch
+import wandb
 import yaml
 from sa_app.common.utils import parse_args
 from sa_app.data.data_cleaner import StackedPreprocessor
@@ -10,8 +11,6 @@ from transformers import (
     AutoTokenizer,
     RobertaConfig,
 )
-
-import wandb
 
 
 class InferenceEngine:
