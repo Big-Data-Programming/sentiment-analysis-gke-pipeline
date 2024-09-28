@@ -8,28 +8,26 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout source code 
+        uses: actions/checkout@v3
 
-    - name: Set up Azure CLI
-      uses: azure/CLI@v1
-      with:
-        azcliversion: latest
+      - name: Azure login
+        id: login
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Set AKS context
+        id: set-context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: '${{ secrets.AZURE_RESOURCE_GROUP }}' 
+          cluster-name: '${{ secrets.AZURE_AKS_CLUSTER_NAME }}'
 
-    - name: Set up AKS credentials
-      run: |
-        az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
-
-    - name: Deploy to AKS cluster
-      run: |
-        sed -i "s/WANDB_API_KEY_VALUE/${{ secrets.WANDB_API_KEY_VALUE }}/g" kubernetes-manifests/inference-service.yaml
-        sed -i "s/mongo_user_value/${{ secrets.mongo_user_value }}/g" kubernetes-manifests/mongo-service.yaml
-        sed -i "s/mongo_pass_value/${{ secrets.mongo_pass_value }}/g" kubernetes-manifests/mongo-service.yaml
-        kubectl apply -f kubernetes-manifests/
+      - name: Deploy to AKS cluster
+        run: |
+          sed -i "s/WANDB_API_KEY_VALUE/${{ secrets.WANDB_API_KEY_VALUE }}/g" kubernetes-manifests/inference-service.yaml
+          sed -i "s/mongo_user_value/${{ secrets.mongo_user_value }}/g" kubernetes-manifests/mongo-service.yaml
+          sed -i "s/mongo_pass_value/${{ secrets.mongo_pass_value }}/g" kubernetes-manifests/mongo-service.yaml
+          kubectl apply -f kubernetes-manifests/
