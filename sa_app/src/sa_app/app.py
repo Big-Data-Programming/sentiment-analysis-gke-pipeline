@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 
 import pytorch_lightning as pl
 import torch
+import wandb
 import yaml
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
@@ -11,8 +12,6 @@ from sa_app.data.data import InitializeDataset, SentimentIterableDataset
 from sa_app.models.model import CustomClassificationHead, Model
 from sa_app.training.lightning_model_wrapper import LightningModelWrapper
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
-
-import wandb
 
 
 def init_model_callbacks(
@@ -138,14 +137,13 @@ def train(
         ckpt_path="last",
     )
 
-    with wandb.init(project=dataset_params["wandb_project_name"]) as run:
+    with wandb.init(project=training_params["wandb_storage"]["name"]) as run:
         best_model = wandb.Artifact(
-            f"{training_params['wandb_storage']['artifact_name']}_{run.id}",
-            type=training_params["wandb_storage"]["artifact_type"],
+            f"{training_params['wandb_storage']['artifact_name']}",
+            type="model",
         )
         best_model.add_file(callbacks[1].best_model_path)
         run.log_artifact(best_model)
-        run.link_artifact(best_model, training_params["wandb_storage"]["register_to"])
 
     wandb.finish()
 
