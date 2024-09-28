@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - id: check-ast
       - id: check-builtin-literals
@@ -25,17 +25,17 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/hadialqattan/pycln
-    rev: v2.2.2
+    rev: v2.4.0
     hooks:
       - id: pycln
         args: [--all]
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 24.8.0
     hooks:
       - id: black
         args: ["-l", "120"]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
         args: ["--profile", "black"]

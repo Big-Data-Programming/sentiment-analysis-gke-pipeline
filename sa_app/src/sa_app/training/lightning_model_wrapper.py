@@ -35,10 +35,10 @@ class LightningModelWrapper(pl.LightningModule):
         self.optimizer_params = optimizer_params
         self.lr_scheduler_params = lr_scheduler_params
         self.unique_config = unique_config
-        self.num_classes = unique_config.get("training_params").get("num_classes")
+        self.num_classes = unique_config.get("training_params").get("custom_classification_head").get("num_labels")
         self.task_name = "multiclass" if self.num_classes > 2 else "binary"
         self.loss_fn = CrossEntropyLoss()
-        self.softmax = torch.nn.Softmax(dim=1)
+        self.softmax = torch.nn.Softmax(dim=-1)
 
         self.train_loss = MeanMetric()
         self.train_acc = Accuracy(task=self.task_name, num_classes=self.num_classes)
@@ -50,16 +50,23 @@ class LightningModelWrapper(pl.LightningModule):
         labels, sentence_batch = x
         [sentence_batch[inp_key].to(self.model.device) for inp_key, value in sentence_batch.items()]
         output = self.model(**sentence_batch)
-        output.logits = self.softmax(output.logits)
-        output.loss = self.loss_fn(output.logits, labels)
-        return {"logits": output.logits, "loss": output.loss}
+
+        probs = self.softmax(output.logits[:, 0, :])
+        # predicted_classes = torch.argmax(probs, dim=-1)
+
+        output.loss = self.loss_fn(output.logits[:, 0, :], labels)  # Taking logit corresp. to CLS token
+        return {"logits": probs, "loss": output.loss}
 
     def training_step(self, batch: dict, batch_idx: int) -> Dict:
         return self.forward(batch)
 
     def on_train_batch_end(self, step_output: Dict, batch: Any, batch_idx: int) -> None:
         self.log_batch_end(
-            step_output=step_output, batch=batch, loss_fn=self.train_loss, acc_fn=self.train_acc, split_type=Split.TRAIN
+            step_output=step_output,
+            batch=batch,
+            loss_fn=self.train_loss,
+            acc_fn=self.train_acc,
+            split_type=Split.TRAIN,
         )
 
     def validation_step(self, batch: dict, batch_idx: int) -> Dict:
@@ -67,7 +74,11 @@ class LightningModelWrapper(pl.LightningModule):
 
     def on_validation_batch_end(self, step_output: Dict, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> None:
         self.log_batch_end(
-            step_output=step_output, batch=batch, loss_fn=self.valid_loss, acc_fn=self.valid_acc, split_type=Split.VALID
+            step_output=step_output,
+            batch=batch,
+            loss_fn=self.valid_loss,
+            acc_fn=self.valid_acc,
+            split_type=Split.VALID,
         )
 
     def on_train_epoch_end(self) -> None:
@@ -76,10 +87,21 @@ class LightningModelWrapper(pl.LightningModule):
     def on_validation_epoch_end(self) -> None:
         self.log_epoch_end(loss_fn=self.valid_loss, split_type=Split.VALID)
 
-    def log_batch_end(self, step_output: dict, batch: dict, loss_fn: Metric, acc_fn: Metric, split_type: Split):
+    def log_batch_end(
+        self,
+        step_output: dict,
+        batch: dict,
+        loss_fn: Metric,
+        acc_fn: Metric,
+        split_type: Split,
+    ):
         loss = step_output.get("loss")
         loss_fn.update(loss)
-        self.log(f"{split_type}_loss_step", loss, batch_size=self.trainer.train_dataloader.batch_size)
+        self.log(
+            f"{split_type}_loss_step",
+            loss,
+            batch_size=self.trainer.train_dataloader.batch_size,
+        )
 
         labels, sentence_batch = batch
         predicted_labels = torch.argmax(step_output.get("logits"), dim=1)

@@ -4,12 +4,13 @@ from typing import Dict, Generator, List, Optional, Tuple
 
 import pandas as pd
 import torch
-import wandb
 from sa_app.data.data_cleaner import StackedPreprocessor
 from sa_app.data.kaggle_dataset import get_dataset_length, get_file_names, split_dataset
 from torch.utils.data import IterableDataset
 from tqdm import tqdm
 from transformers import AutoTokenizer
+
+import wandb
 
 
 def kaggle_dataset_iterator(file_map: dict, chunk_size=1000, split_type="train") -> pd.DataFrame:
@@ -24,14 +25,18 @@ class InitializeDataset:
     def __call__(self, *args, **kwargs) -> Tuple[str, str]:
         if self.dataset_params.get("wandb_storage") is not None:
             wandb_storage = self.dataset_params.get("wandb_storage")
-            wandb_user_id = wandb_storage.get("wandb_user_id")
-            wandb_project_name = wandb_storage.get("wandb_project_name")
+            wandb_user_id = self.dataset_params.get("wandb_user_id")
+            wandb_project_name = self.dataset_params.get("wandb_project_name")
             wandb_artifact_name = wandb_storage.get("wandb_artifact_name")
             wandb_artifact_type = wandb_storage.get("wandb_artifact_type")
             wandb_file_type = wandb_storage.get("training_file_type")
             wandb_artifact_version = wandb_storage.get("wandb_artifact_version")
             labels_mapping_file_name = wandb_storage.get("labels_mapping_file_name")
-            run = wandb.init(entity=wandb_user_id, project=wandb_project_name, job_type="download_dataset")
+            run = wandb.init(
+                entity=wandb_user_id,
+                project=wandb_project_name,
+                job_type="download_dataset",
+            )
             artifact = run.use_artifact(
                 f"{wandb_user_id}/{wandb_project_name}/{wandb_artifact_name}:{wandb_artifact_version}",
                 type=f"{wandb_artifact_type}",
@@ -48,7 +53,7 @@ class InitializeDataset:
             mapping_file = local_storage.get("labels_mapping")
             return csv_file, mapping_file
         else:
-            raise NotImplementedError(f"Either of wandb_storage or local_storage should be defined in app_cfg.yml")
+            raise NotImplementedError("Either of wandb_storage or local_storage should be defined in app_cfg.yml")
 
 
 class SentimentIterableDataset(IterableDataset):
@@ -72,7 +77,11 @@ class SentimentIterableDataset(IterableDataset):
         self.batch_size = batch_size
         self.preprocessors = StackedPreprocessor(preprocessors)
         data_files = get_file_names(self.csv_file)
-        self.file_map = {"train": data_files[0], "valid": data_files[1], "test": data_files[2]}
+        self.file_map = {
+            "train": data_files[0],
+            "valid": data_files[1],
+            "test": data_files[2],
+        }
         if os.path.isfile(self.file_map[split_type]) is False:
             print("Splitting the dataset")
             split_dataset(self.csv_file)
@@ -90,7 +99,7 @@ class SentimentIterableDataset(IterableDataset):
 
                 sentences_minibatch: Dict[str, List[str]] = self.tokenizer(
                     self.preprocessors(list(data.iloc[i : i + self.batch_size, 5].values)),
-                    add_special_tokens=False,
+                    add_special_tokens=True,
                     truncation=True,
                     max_length=self.max_seq_len,
                     padding=True,

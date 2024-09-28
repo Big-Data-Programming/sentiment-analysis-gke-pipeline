@@ -8,17 +8,20 @@ seed: &seed 42
 # Data params #
 ###############
 dataset_params:
-  wandb_storage:
-    wandb_user_id: "prabhupad26"
-    wandb_project_name: "sa-roberta"
-    wandb_artifact_name: "sentiment-dataset"
-    wandb_artifact_type: "training_dataset"
-    wandb_artifact_version: "latest"
-    training_file_type: "csv"
-    labels_mapping_file_name: "mapping.txt"
-  local_storage:
-    raw_dataset_file: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/sa_data_storage/training.1600000.processed.noemoticon.csv"
-    labels_mapping: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/bdp2_apr22_exam-bdp2_apr22_group_2/sa_app/config_files/mapping.txt"
+  wandb_user_id: "prabhupad26"
+  wandb_project_name: "sa-roberta"
+  
+  # wandb_storage: # If this is defined the data artifacts are downloaded from wandb
+  #   wandb_user_id: "prabhupad26"
+  #   wandb_project_name: "sa-roberta"
+  #   wandb_artifact_name: "sentiment-dataset"
+  #   wandb_artifact_type: "training_dataset"
+  #   wandb_artifact_version: "v1" # mention the specific version here
+  #   training_file_type: "csv"
+  #   labels_mapping_file_name: "mapping.txt"
+  local_storage: # If wandb_storage is not defined the data artifacts referred from local path configured below
+    raw_dataset_file: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\dataset\\training.1600000.processed.noemoticon.csv"
+    labels_mapping: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\sentiment-analysis-gke-pipeline\\sa_app\\config_files\\mapping.txt"
   max_length: 128
   batch_size: 32
   preprocessors:
@@ -30,8 +33,8 @@ dataset_params:
       language: 'english'
     lemma:
       model_name: 'en_core_web_sm'
-
-
+    cardiffnlp_processor:
+      {}
 
 
 ###################
@@ -39,11 +42,15 @@ dataset_params:
 ###################
 training_params:
   base-model-name: "cardiffnlp/twitter-roberta-base"
-  num_classes: 2
   train_mode: "fine_tune_base_model"
+  debug_size: 3
   tokenizer: 'bert-base-uncased'
   learning_rate: 1e-5
-  num_epochs: 5
+  num_epochs: 1
+
+  custom_classification_head:
+    input_dim: 768
+    num_labels: 2
 
   optimizer:
     type_: adamW
@@ -60,17 +67,25 @@ training_params:
 #    max_epochs: 20
 #    accumulate_grad_batches: 1 # use when memory is not sufficient
     gradient_clip_val: 1
-    precision: bf16-mixed
-#    precision: 16-mixed
-    log_every_n_steps: 50
-    val_check_interval: 5
-    limit_val_batches: 2
+    # precision: bf16-mixed
+    precision: 16-mixed
+    limit_train_batches: 3
+    limit_val_batches: 3
+    log_every_n_steps: 3
+    val_check_interval: 1
+    
+
+  wandb_storage:
+    artifact_name: "best_model_checkpoint"
+    artifact_type: "model"
+    register_to: "model-registry/sentiment-analysis-classifier"
+
   logging:
-    log_dir: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/logs"
+    log_dir: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\logs"
 
   callbacks:
-    dirpath: "/home/ppradhan/Documents/my_learnings/my_uni_stuffs/logs/models"
-    monitor_var: 'train_loss_step'
+    dirpath: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\models"
+    monitor_var: 'valid_acc_step'
     monitor_var_mode: 'max'
     save_top_k: 1
 

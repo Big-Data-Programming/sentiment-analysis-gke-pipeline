@@ -3,18 +3,21 @@ from typing import Dict, List, Tuple
 
 import pytorch_lightning as pl
 import torch
-import wandb
 import yaml
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from sa_app.common.utils import init_model_loggers, parse_args
 from sa_app.data.data import InitializeDataset, SentimentIterableDataset
-from sa_app.models.model import Model
+from sa_app.models.model import CustomClassificationHead, Model
 from sa_app.training.lightning_model_wrapper import LightningModelWrapper
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 
+import wandb
 
-def init_model_callbacks(training_params: dict) -> List[LearningRateMonitor | ModelCheckpoint]:
+
+def init_model_callbacks(
+    training_params: dict,
+) -> List[LearningRateMonitor | ModelCheckpoint]:
     model_checkpoint = ModelCheckpoint(
         dirpath=training_params["callbacks"]["dirpath"],
         filename="best_model",
@@ -30,13 +33,19 @@ def init_model_callbacks(training_params: dict) -> List[LearningRateMonitor | Mo
     return callbacks
 
 
-def load_model(training_params: Dict) -> Tuple[Dict, AutoModelForSequenceClassification]:
+def load_model(
+    training_params: Dict,
+) -> Tuple[Dict, AutoModelForSequenceClassification]:
     # load HF configs
     model_config = AutoConfig.from_pretrained(training_params.get("base-model-name"))
 
     # Load model (downloads from hub for the first time)
     model = Model.from_config(training_params.get("train_mode"))
     model = model.from_pretrained(training_params.get("base-model-name"), config=model_config)
+
+    # Attach custom classifier
+    model.classifier = CustomClassificationHead(**training_params.get("custom_classification_head"))
+
     for params in model.parameters():
         params.requires_grad = False
 
@@ -67,7 +76,11 @@ def get_dataset(
 
 
 def get_trainer(
-    loggers: List[WandbLogger], devices: List[str] | str, accelerator: str, callbacks: List, training_params: Dict
+    loggers: List[WandbLogger],
+    devices: List[str] | str,
+    accelerator: str,
+    callbacks: List,
+    training_params: Dict,
 ) -> pl.Trainer:
     trainer = pl.Trainer(
         logger=loggers,
@@ -80,7 +93,12 @@ def get_trainer(
 
 
 def train(
-    config: dict, device: list[str], training_params: Dict, dataset_params: Dict, seed: int, inference_params: Dict
+    config: dict,
+    device: list[str],
+    training_params: Dict,
+    dataset_params: Dict,
+    seed: int,
+    inference_params: Dict,
 ):
     # wandb login
     wandb.login(key=os.getenv("WANDB_API_KEY"))
@@ -97,7 +115,7 @@ def train(
     model_wrapped = LightningModelWrapper(
         model=model,
         optimizer_params=training_params["optimizer"],
-        lr_scheduler_params=training_params["lr_scheduler"] if "lr_scheduler" in training_params else None,
+        lr_scheduler_params=(training_params["lr_scheduler"] if "lr_scheduler" in training_params else None),
         unique_config=config,
     ).to(device)
 
@@ -113,9 +131,14 @@ def train(
     trainer = get_trainer(loggers, devices, accelerator, callbacks, training_params)
 
     # Initiate trainer
-    trainer.fit(model=model_wrapped, train_dataloaders=train_dataset, val_dataloaders=valid_dataset, ckpt_path="last")
+    trainer.fit(
+        model=model_wrapped,
+        train_dataloaders=train_dataset,
+        val_dataloaders=valid_dataset,
+        ckpt_path="last",
+    )
 
-    with wandb.init(project=dataset_params["wandb_storage"]["wandb_project_name"]) as run:
+    with wandb.init(project=dataset_params["wandb_project_name"]) as run:
         best_model = wandb.Artifact(
             f"{training_params['wandb_storage']['artifact_name']}_{run.id}",
             type=training_params["wandb_storage"]["artifact_type"],
@@ -132,7 +155,7 @@ def main():
     config = yaml.safe_load(open(args.config, "r"))
     device = "cuda" if torch.cuda.is_available() else "cpu"
     if device == "cuda":
-        device = "cuda:3"
+        device = "cuda:3"  # Hardcoded device id
     if args.mode == "train":
         train(config=config, device=device, **config)
     else:

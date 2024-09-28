@@ -30,6 +30,7 @@
 4. Install package in develop mode via `pip install -e .[tests]`.
 5. Install `pre-commit` via `pre-commit install`.
    * Optional: Run hooks once on all files via `pre-commit run --all-files`
+   * Make sure to autoupdate `pre-commit autoupdate`
 
 
 ## Wandb cmds
