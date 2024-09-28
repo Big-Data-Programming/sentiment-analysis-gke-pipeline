@@ -3,15 +3,16 @@ from typing import Dict, List, Tuple
 
 import pytorch_lightning as pl
 import torch
-import wandb
 import yaml
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from sa_app.common.utils import init_model_loggers, parse_args
 from sa_app.data.data import InitializeDataset, SentimentIterableDataset
-from sa_app.models.model import Model, CustomClassificationHead
+from sa_app.models.model import CustomClassificationHead, Model
 from sa_app.training.lightning_model_wrapper import LightningModelWrapper
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
+
+import wandb
 
 
 def init_model_callbacks(
@@ -40,14 +41,10 @@ def load_model(
 
     # Load model (downloads from hub for the first time)
     model = Model.from_config(training_params.get("train_mode"))
-    model = model.from_pretrained(
-        training_params.get("base-model-name"), config=model_config
-    )
+    model = model.from_pretrained(training_params.get("base-model-name"), config=model_config)
 
     # Attach custom classifier
-    model.classifier = CustomClassificationHead(
-        **training_params.get("custom_classification_head")
-    )
+    model.classifier = CustomClassificationHead(**training_params.get("custom_classification_head"))
 
     for params in model.parameters():
         params.requires_grad = False
@@ -118,11 +115,7 @@ def train(
     model_wrapped = LightningModelWrapper(
         model=model,
         optimizer_params=training_params["optimizer"],
-        lr_scheduler_params=(
-            training_params["lr_scheduler"]
-            if "lr_scheduler" in training_params
-            else None
-        ),
+        lr_scheduler_params=(training_params["lr_scheduler"] if "lr_scheduler" in training_params else None),
         unique_config=config,
     ).to(device)
 
@@ -145,9 +138,7 @@ def train(
         ckpt_path="last",
     )
 
-    with wandb.init(
-        project=dataset_params["wandb_project_name"]
-    ) as run:
+    with wandb.init(project=dataset_params["wandb_project_name"]) as run:
         best_model = wandb.Artifact(
             f"{training_params['wandb_storage']['artifact_name']}_{run.id}",
             type=training_params["wandb_storage"]["artifact_type"],

@@ -1,6 +1,6 @@
-from transformers import AutoModelForSequenceClassification
-import torch.nn as nn
 import torch
+import torch.nn as nn
+from transformers import AutoModelForSequenceClassification
 
 MODEL = {"fine_tune_base_model": AutoModelForSequenceClassification}
 

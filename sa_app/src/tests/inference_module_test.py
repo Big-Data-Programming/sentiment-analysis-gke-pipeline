@@ -2,9 +2,10 @@ import os
 
 import pytest
 import torch
-import wandb
 import yaml
 from sa_app.inference.inference import InferenceEngine
+
+import wandb
 
 
 @pytest.fixture

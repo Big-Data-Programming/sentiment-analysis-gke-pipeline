@@ -4,17 +4,16 @@ from typing import Dict, Generator, List, Optional, Tuple
 
 import pandas as pd
 import torch
-import wandb
 from sa_app.data.data_cleaner import StackedPreprocessor
 from sa_app.data.kaggle_dataset import get_dataset_length, get_file_names, split_dataset
 from torch.utils.data import IterableDataset
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
+import wandb
 
-def kaggle_dataset_iterator(
-    file_map: dict, chunk_size=1000, split_type="train"
-) -> pd.DataFrame:
+
+def kaggle_dataset_iterator(file_map: dict, chunk_size=1000, split_type="train") -> pd.DataFrame:
     dataset_path = file_map[split_type]
     return pd.read_csv(dataset_path, encoding="latin-1", chunksize=chunk_size)
 
@@ -43,14 +42,10 @@ class InitializeDataset:
                 type=f"{wandb_artifact_type}",
             )
             artifact_dir = artifact.download()
-            assert (
-                len(glob(f"{artifact_dir}/*.{wandb_file_type}")) > 0
-            ), "CSV file download failed"
+            assert len(glob(f"{artifact_dir}/*.{wandb_file_type}")) > 0, "CSV file download failed"
             csv_file = glob(f"{artifact_dir}/*.{wandb_file_type}")[0]
             mapping_file = os.path.join(artifact_dir, labels_mapping_file_name)
-            assert (
-                os.path.isfile(mapping_file) is True
-            ), "Label mapping file download failed"
+            assert os.path.isfile(mapping_file) is True, "Label mapping file download failed"
             return csv_file, mapping_file
         elif self.dataset_params.get("local_storage") is not None:
             local_storage = self.dataset_params.get("local_storage")
@@ -58,9 +53,7 @@ class InitializeDataset:
             mapping_file = local_storage.get("labels_mapping")
             return csv_file, mapping_file
         else:
-            raise NotImplementedError(
-                "Either of wandb_storage or local_storage should be defined in app_cfg.yml"
-            )
+            raise NotImplementedError("Either of wandb_storage or local_storage should be defined in app_cfg.yml")
 
 
 class SentimentIterableDataset(IterableDataset):
@@ -97,21 +90,15 @@ class SentimentIterableDataset(IterableDataset):
         return get_dataset_length(self.csv_file, self.split_type) // self.batch_size
 
     def __iter__(self) -> Generator[Tuple[List[str], Dict[str, List[str]]], None, None]:
-        for data in kaggle_dataset_iterator(
-            self.file_map, chunk_size=self.chunk_size, split_type=self.split_type
-        ):
+        for data in kaggle_dataset_iterator(self.file_map, chunk_size=self.chunk_size, split_type=self.split_type):
             for i in range(0, len(data), self.batch_size):
                 # Label mapping is also done here, 0 - negative sentiment, 1 - positive sentiment
                 labels_minibatch: List[int] = list(
-                    data.iloc[i : i + self.batch_size, 0]
-                    .apply(lambda x: 0 if x == 0 else 1)
-                    .values
+                    data.iloc[i : i + self.batch_size, 0].apply(lambda x: 0 if x == 0 else 1).values
                 )
 
                 sentences_minibatch: Dict[str, List[str]] = self.tokenizer(
-                    self.preprocessors(
-                        list(data.iloc[i : i + self.batch_size, 5].values)
-                    ),
+                    self.preprocessors(list(data.iloc[i : i + self.batch_size, 5].values)),
                     add_special_tokens=True,
                     truncation=True,
                     max_length=self.max_seq_len,
@@ -122,9 +109,7 @@ class SentimentIterableDataset(IterableDataset):
 
                 sentences = {
                     "input_ids": torch.tensor(sentences_minibatch["input_ids"]),
-                    "attention_mask": torch.tensor(
-                        sentences_minibatch["attention_mask"]
-                    ),
+                    "attention_mask": torch.tensor(sentences_minibatch["attention_mask"]),
                 }
                 yield labels_tensor, sentences
 

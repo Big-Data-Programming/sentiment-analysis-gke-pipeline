@@ -80,9 +80,7 @@ class StackedPreprocessor(BasePreprocessor):
         if preprocessors is None:
             preprocessors = {}
 
-        self.preprocessors = [
-            PREPROCESSORS[name](**params) for name, params in preprocessors.items()
-        ]
+        self.preprocessors = [PREPROCESSORS[name](**params) for name, params in preprocessors.items()]
 
     def __call__(self, text_batch: List[str]) -> List[str]:
         processed_batch = []
