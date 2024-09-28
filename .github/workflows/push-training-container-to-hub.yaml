@@ -1,11 +1,8 @@
 name: Build and Publish Training Docker Image
 on:
-  pull_request:
-    paths:
-      - sa_app/src/pyproject.toml
-      - sa_app/config_files/app_cfg.yml
+  push:
     branches:
-      - main
+      - training/* # Strictly for training purpose
 
 jobs:
   build-and-publish:

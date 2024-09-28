@@ -1,0 +1,35 @@
+name: Deploy to AKS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Azure CLI
+      uses: azure/CLI@v1
+      with:
+        azcliversion: latest
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set up AKS credentials
+      run: |
+        az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
+
+    - name: Deploy to AKS cluster
+      run: |
+        sed -i "s/WANDB_API_KEY_VALUE/${{ secrets.WANDB_API_KEY_VALUE }}/g" kubernetes-manifests/inference-service.yaml
+        sed -i "s/mongo_user_value/${{ secrets.mongo_user_value }}/g" kubernetes-manifests/mongo-service.yaml
+        sed -i "s/mongo_pass_value/${{ secrets.mongo_pass_value }}/g" kubernetes-manifests/mongo-service.yaml
+        kubectl apply -f kubernetes-manifests/
