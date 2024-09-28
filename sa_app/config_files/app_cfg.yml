@@ -7,18 +7,11 @@ seed: &seed 42
 ###############
 # Data params #
 ###############
-dataset_params:
-  wandb_user_id: "prabhupad26"
-  wandb_project_name: "sa-roberta"
-  
+dataset_params:  
   # wandb_storage: # If this is defined the data artifacts are downloaded from wandb
-  #   wandb_user_id: "prabhupad26"
-  #   wandb_project_name: "sa-roberta"
-  #   wandb_artifact_name: "sentiment-dataset"
-  #   wandb_artifact_type: "training_dataset"
-  #   wandb_artifact_version: "v1" # mention the specific version here
-  #   training_file_type: "csv"
-  #   labels_mapping_file_name: "mapping.txt"
+  #   wandb_dataset_url: "bdp_grp2/sa-roberta/sentiment-dataset:v1"
+  #   src_file_type: "csv"
+  #   mapping_file_name: "mapping.txt"
   local_storage: # If wandb_storage is not defined the data artifacts referred from local path configured below
     raw_dataset_file: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\dataset\\training.1600000.processed.noemoticon.csv"
     labels_mapping: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\sentiment-analysis-gke-pipeline\\sa_app\\config_files\\mapping.txt"
@@ -76,9 +69,9 @@ training_params:
     
 
   wandb_storage:
+    name: "sa-roberta"
     artifact_name: "best_model_checkpoint"
     artifact_type: "model"
-    register_to: "model-registry/sentiment-analysis-classifier"
 
   logging:
     log_dir: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\logs"
@@ -95,4 +88,6 @@ training_params:
 ####################
 
 inference_params:
-  model_dir: "cardiffnlp/twitter-roberta-base"
+  model_dir: "bdp_grp2-org/wandb-registry-model/test:v0"
+  default_model_name: "best_model-v4.ckpt"
+  base_model_name: "cardiffnlp/twitter-roberta-base"

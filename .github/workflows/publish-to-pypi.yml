@@ -1,11 +1,11 @@
 name: Publish sa_app to pypi repository
 
 on:
-  push:
+  pull_request:  # Ensures this action runs on pull request creation
     paths:
       - sa_app/src/pyproject.toml
     branches:
-      - develop
+      - main
 
 jobs:
   build-linux:

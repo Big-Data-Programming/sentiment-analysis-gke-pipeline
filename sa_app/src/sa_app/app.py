@@ -138,14 +138,13 @@ def train(
         ckpt_path="last",
     )
 
-    with wandb.init(project=dataset_params["wandb_project_name"]) as run:
+    with wandb.init(project=training_params["wandb_storage"]["name"]) as run:
         best_model = wandb.Artifact(
-            f"{training_params['wandb_storage']['artifact_name']}_{run.id}",
-            type=training_params["wandb_storage"]["artifact_type"],
+            f"{training_params['wandb_storage']['artifact_name']}",
+            type="model",
         )
         best_model.add_file(callbacks[1].best_model_path)
         run.log_artifact(best_model)
-        run.link_artifact(best_model, training_params["wandb_storage"]["register_to"])
 
     wandb.finish()
 

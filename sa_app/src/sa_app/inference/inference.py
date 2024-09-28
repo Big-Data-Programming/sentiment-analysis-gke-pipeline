@@ -1,27 +1,67 @@
+import os
 from typing import Dict
 
 import torch
 import yaml
-from sa_app.common.utils import load_mapping, parse_args
-from sa_app.data.data import InitializeDataset
+from sa_app.common.utils import parse_args
 from sa_app.data.data_cleaner import StackedPreprocessor
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    RobertaConfig,
+)
+
+import wandb
 
 
 class InferenceEngine:
-    def __init__(self, inference_params: Dict, training_params: Dict, dataset_params: Dict, device: str):
+    def __init__(
+        self,
+        inference_params: Dict,
+        training_params: Dict,
+        dataset_params: Dict,
+        device: str,
+    ):
         # TODO : Download artifacts from wandb
         # Set the device to CPU or GPU
         self.device = device
 
         # Load the trained model and tokenizer
-        self.model_path = inference_params["model_dir"]
-        self.model = AutoModelForSequenceClassification.from_pretrained(self.model_path).to(self.device)
+        self.model = self.get_wandb_model(inference_params)
         self.tokenizer = AutoTokenizer.from_pretrained(training_params["tokenizer"])
+
+        # Preprecessor
         self.preprocessors = StackedPreprocessor(dataset_params["preprocessors"])
-        dataset_obj = InitializeDataset(dataset_params)
-        _, label_mapping_path = dataset_obj()
-        self.label_mapping = load_mapping(label_mapping_path)
+
+        # Dataset initialization
+        # dataset_obj = InitializeDataset(dataset_params)
+        # _, label_mapping_path = dataset_obj()
+        # print(label_mapping_path)
+        # self.label_mapping = load_mapping(label_mapping_path)
+        self.label_mapping = ["positive", "negative"]
+
+    def get_wandb_model(self, inference_params):
+        # Download checkpoint from wandb
+        run = wandb.init()
+        artifact = run.use_artifact(inference_params["model_dir"], type="model")
+        artifact_dir = artifact.download()
+
+        # Load checkpoint into the pretrained model
+        checkpoint_pth = os.path.join(artifact_dir, inference_params["default_model_name"])
+        state_dict = torch.load(checkpoint_pth)
+        new_state_dict = {}
+        for key in state_dict["state_dict"].keys():
+            if key.startswith("model."):
+                new_key = key.replace("model.", "")  # Remove 'model.' prefix
+                new_state_dict[new_key] = state_dict["state_dict"][key]
+
+        config = RobertaConfig.from_pretrained(
+            inference_params["base_model_name"], num_labels=2
+        )  # TODO: Remove hardcoding
+        model = AutoModelForSequenceClassification.from_config(config).to(self.device)
+        model.load_state_dict(new_state_dict)
+
+        return model
 
     def perform_inference(self, sentence):
         # Preprocess the input sentence
@@ -31,11 +71,16 @@ class InferenceEngine:
         inputs = self.tokenizer(sentence, truncation=True, padding=True, return_tensors="pt")
         inputs = inputs.to(self.device)
 
+        # Eval mode
+        self.model.eval()
+
         # Forward pass through the model
-        outputs = self.model(**inputs)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
 
         # Get the predicted labels
-        predicted_labels = torch.argmax(outputs.logits, dim=1)
+        probs = torch.softmax(outputs.logits, dim=-1)
+        predicted_labels = torch.argmax(probs, dim=-1)
 
         return self.label_mapping[predicted_labels.tolist()[0]]
 

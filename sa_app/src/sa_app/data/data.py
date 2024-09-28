@@ -21,34 +21,31 @@ def kaggle_dataset_iterator(file_map: dict, chunk_size=1000, split_type="train")
 class InitializeDataset:
     def __init__(self, dataset_params):
         self.dataset_params = dataset_params
+        self.wandb_storage = self.dataset_params.get("wandb_storage")
+        self.local_storage = self.dataset_params.get("local_storage")
 
     def __call__(self, *args, **kwargs) -> Tuple[str, str]:
-        if self.dataset_params.get("wandb_storage") is not None:
-            wandb_storage = self.dataset_params.get("wandb_storage")
-            wandb_user_id = self.dataset_params.get("wandb_user_id")
-            wandb_project_name = self.dataset_params.get("wandb_project_name")
-            wandb_artifact_name = wandb_storage.get("wandb_artifact_name")
-            wandb_artifact_type = wandb_storage.get("wandb_artifact_type")
-            wandb_file_type = wandb_storage.get("training_file_type")
-            wandb_artifact_version = wandb_storage.get("wandb_artifact_version")
-            labels_mapping_file_name = wandb_storage.get("labels_mapping_file_name")
-            run = wandb.init(
-                entity=wandb_user_id,
-                project=wandb_project_name,
-                job_type="download_dataset",
-            )
-            artifact = run.use_artifact(
-                f"{wandb_user_id}/{wandb_project_name}/{wandb_artifact_name}:{wandb_artifact_version}",
-                type=f"{wandb_artifact_type}",
-            )
+
+        if self.wandb_storage is not None:
+            storage_url = self.wandb_storage.get("wandb_dataset_url")
+            wandb_file_type = self.wandb_storage.get("src_file_type")
+            mapping_file_name = self.wandb_storage.get("mapping_file_name")
+
+            # Download artifacts from wandb
+            run = wandb.init()
+            artifact = run.use_artifact(storage_url, type="training_dataset")
             artifact_dir = artifact.download()
+
+            # Artifact Validation
             assert len(glob(f"{artifact_dir}/*.{wandb_file_type}")) > 0, "CSV file download failed"
             csv_file = glob(f"{artifact_dir}/*.{wandb_file_type}")[0]
-            mapping_file = os.path.join(artifact_dir, labels_mapping_file_name)
+            mapping_file = os.path.join(artifact_dir, mapping_file_name)
             assert os.path.isfile(mapping_file) is True, "Label mapping file download failed"
+
             return csv_file, mapping_file
-        elif self.dataset_params.get("local_storage") is not None:
-            local_storage = self.dataset_params.get("local_storage")
+
+        elif self.local_storage is not None:
+            local_storage = self.local_storage
             csv_file = local_storage.get("raw_dataset_file")
             mapping_file = local_storage.get("labels_mapping")
             return csv_file, mapping_file

@@ -28,3 +28,4 @@ def test_inference(sample_config):
     input_sentence = "I feel so bad today . Such a bad day :( "
     predicted_labels = ie_obj.perform_inference(input_sentence)
     assert isinstance(predicted_labels, str) is True
+    assert predicted_labels == "negative"
