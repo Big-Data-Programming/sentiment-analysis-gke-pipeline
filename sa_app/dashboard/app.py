@@ -99,7 +99,7 @@ if collect_btn:
             sentiment_pred = get_sentiment(u_id, row[5])
 
             # TODO : Hardcoded for testing frontend
-            sentiment_pred = label_mapping[row[0]]
+            # sentiment_pred = label_mapping[row[0]]
             print(f"For {row[5]}, prediction is : {sentiment_pred}")
             tweet_count += 1
 
