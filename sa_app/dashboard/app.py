@@ -55,7 +55,7 @@ def update_donut(sentiment_cnt_dict):
     )
     fig = px.pie(sentiment_data, names="Sentiment", values="Count", hole=0.5)
     fig.update_traces(textinfo="percent+label", pull=[0.2, 0])
-    st.plotly_chart(fig, use_container_width=False)
+    return fig
 
 
 # read csv from a URL
