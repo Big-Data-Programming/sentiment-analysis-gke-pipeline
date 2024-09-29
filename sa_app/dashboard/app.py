@@ -53,7 +53,13 @@ def update_donut(sentiment_cnt_dict):
             "Count": list(sentiment_cnt_dict.values()),
         }
     )
-    fig = px.pie(sentiment_data, names="Sentiment", values="Count", hole=0.5)
+    fig = px.pie(
+        sentiment_data,
+        names="Sentiment",
+        values="Count",
+        hole=0.5,
+        title="Sentiment Distribution",
+    )
     fig.update_traces(textinfo="percent+label", pull=[0.2, 0])
     return fig
 
@@ -145,12 +151,10 @@ if collect_btn:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("Sentiment Distribution")
     donut_fig = update_donut(sentiment_cnt)
     st.plotly_chart(donut_fig, use_container_width=True)
 
 with col2:
-    st.subheader("Sentiment Count Over Time")
     if sentiment_time_series:
         df_sentiment_time_series = pd.DataFrame(sentiment_time_series, columns=["Date", "Sentiment"])
         sentiment_count_per_day = (
@@ -167,4 +171,4 @@ with col2:
         )
         st.plotly_chart(line_fig, use_container_width=True)
 # For Debug
-st.table(pd.DataFrame(results, columns=["Tweet_Content", "Actual", "Prediction"]))
+# st.table(pd.DataFrame(results, columns=["Tweet_Content", "Actual", "Prediction"]))

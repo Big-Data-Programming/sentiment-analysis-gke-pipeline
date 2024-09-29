@@ -19,7 +19,7 @@ jobs:
       - name: Build and Tag Docker image
         run: |
           docker build -t sa_analytics_dashboard -f sa_app/dashboard/Dockerfile_dashboard .
-          docker tag sa_analytics_dashboard prabhupad26/sa_analytics_dashboard:0.34
+          docker tag sa_analytics_dashboard prabhupad26/sa_analytics_dashboard:0.35
 
       - name: Push Docker image to Docker Hub
-        run: docker push prabhupad26/sa_analytics_dashboard:0.34
+        run: docker push prabhupad26/sa_analytics_dashboard:0.35
