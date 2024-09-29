@@ -7,11 +7,7 @@ import torch
 import yaml
 from sa_app.common.utils import parse_args
 from sa_app.data.data_cleaner import StackedPreprocessor
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    RobertaConfig,
-)
+from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 
 
 class InferenceEngine:
@@ -27,7 +23,7 @@ class InferenceEngine:
         self.device = device
 
         # Load the trained model and tokenizer
-        self.model = self.get_wandb_model(inference_params)
+        self.model, self.model_config = self.get_wandb_model(inference_params)
         self.tokenizer = AutoTokenizer.from_pretrained(training_params["tokenizer"])
 
         # Preprecessor
@@ -55,13 +51,11 @@ class InferenceEngine:
         #         new_key = key.replace("model.", "")  # Remove 'model.' prefix
         #         new_state_dict[new_key] = state_dict["state_dict"][key]
 
-        config = RobertaConfig.from_pretrained(
-            inference_params["base_model_name"], num_labels=2
-        )  # TODO: Remove hardcoding
+        config = AutoConfig.from_pretrained(inference_params["base_model_name"])  # TODO: Remove hardcoding
         model = AutoModelForSequenceClassification.from_config(config).to(self.device)
         # model.load_state_dict(new_state_dict)
 
-        return model
+        return model, config
 
     def perform_inference(self, sentence):
         # Preprocess the input sentence
@@ -79,10 +73,10 @@ class InferenceEngine:
             outputs = self.model(**inputs)
 
         # Get the predicted labels
-        probs = torch.softmax(outputs.logits, dim=-1)
+        probs = torch.softmax(outputs[0][0], dim=-1)
         predicted_labels = torch.argmax(probs, dim=-1)
 
-        return self.label_mapping[predicted_labels.tolist()[0]]
+        return self.model_config.id2label[predicted_labels.tolist()]
 
 
 if __name__ == "__main__":
@@ -96,10 +90,11 @@ if __name__ == "__main__":
         dataset_params=config["dataset_params"],
         device=device_in_use,
     )
-    input_sentence = "I feel so bad today . Such a bad day :( "
+    # input_sentence = "I feel so bad today . Such a bad day :( "
     # input_sentence = """
     # @swikey haha, okay, i feel much better now.
     # let's just dye our hair paramore red!
     # """
+    input_sentence = "Covid cases are increasing fast!"
     predicted_labels = ie_obj.perform_inference(input_sentence)
     print("Predicted labels:", predicted_labels)
