@@ -72,7 +72,7 @@ def convert_to_datetime(timestamp_str):
 
 
 # dashboard title
-st.title("Sentiment Analysis Dashboard")
+st.title("Sentiment Analysis Analytics Dashboard")
 
 topic_limit = st.text_input(
     label="Number of tweets to be analysed",
