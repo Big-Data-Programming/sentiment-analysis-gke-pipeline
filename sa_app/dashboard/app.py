@@ -77,8 +77,28 @@ def convert_to_datetime(timestamp_str):
     return datetime.strptime(timestamp_str, "%a %b %d %H:%M:%S PDT %Y")
 
 
+def update_user_sentiments_map(user_sentiments_df):
+    # Create an interactive bar chart using Plotly
+    fig = px.bar(
+        user_sentiments_df,
+        x="user_id",
+        y="count",
+        color="sentiment",
+        title="User to Sentiments Map",
+        barmode="group",
+        labels={"user_id": "User ID", "count": "Count"},
+        hover_data=["user_id", "count", "sentiment"],
+    )
+    fig.update_layout(
+        xaxis={"categoryorder": "total descending"},
+        yaxis_title="Number of Tweets",
+        xaxis_title="User ID",
+    )
+    return fig
+
+
 # dashboard title
-st.title("Sentiment Analysis Analytics Dashboard")
+st.title("Twitter Data Sentiment Analysis Dashboard (Demo)")
 
 topic_limit = st.text_input(
     label="Number of tweets to be analysed",
@@ -92,7 +112,7 @@ tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0, "neutral": 0}
 label_mapping = {0: "negative", 1: "neutral", 2: "positive"}
 label_mapping_raw_data = {0: "negative", 2: "neutral", 4: "positive"}
-
+user2sentiments_map = {}
 results = []
 sentiment_time_series = []
 
@@ -113,21 +133,19 @@ if collect_btn:
             if sentiment_pred is not None:
                 sentiment_cnt[sentiment_pred] += 1
 
+                # Update user to sentiments map
+                if row[4] not in user2sentiments_map:
+                    user2sentiments_map[row[4]] = {
+                        "positive": 0,
+                        "negative": 0,
+                        "neutral": 0,
+                    }
+
+                user2sentiments_map[row[4]][sentiment_pred] += 1
+
                 with placeholder.container():
                     # create three columns
                     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-
-                    # Centering the values
-                    st.markdown(
-                        """
-                                <style>
-                                [data-testid="metric-container"] {
-                                    justify-content: center; /* Center the metric values */
-                                }
-                                </style>
-                                """,
-                        unsafe_allow_html=True,
-                    )
 
                     # fill in those three columns with respective metrics or KPIs
                     kpi1.metric(
@@ -146,6 +164,19 @@ if collect_btn:
 
             tweet_datetime = convert_to_datetime(row[2])
             sentiment_time_series.append([tweet_datetime.date(), sentiment_pred])
+
+    # Convert user2sentiments_map to a DataFrame
+    user_sentiments_list = []
+    for user_id, sentiments in user2sentiments_map.items():
+        for sentiment, count in sentiments.items():
+            user_sentiments_list.append({"user_id": user_id, "sentiment": sentiment, "count": count})
+
+    user_sentiments_df = pd.DataFrame(user_sentiments_list)
+
+    # Add an interactive plot to display user to sentiments map
+    with st.expander("User to Sentiments Map", expanded=True):
+        user_sentiments_fig = update_user_sentiments_map(user_sentiments_df)
+        st.plotly_chart(user_sentiments_fig, use_container_width=True)
 
 # Create columns for the donut and line charts
 col1, col2 = st.columns(2)
