@@ -20,7 +20,7 @@ jobs:
       - name: Build and Tag Docker image
         run: |
           docker build -t sa_analytics_inference -f Dockerfile_Inference .
-          docker tag sa_analytics_inference prabhupad26/sa_analytics_inference:0.10
+          docker tag sa_analytics_inference prabhupad26/sa_analytics_inference:0.11
 
       - name: Push Docker image to Docker Hub
-        run: docker push prabhupad26/sa_analytics_inference:0.10
+        run: docker push prabhupad26/sa_analytics_inference:0.11
