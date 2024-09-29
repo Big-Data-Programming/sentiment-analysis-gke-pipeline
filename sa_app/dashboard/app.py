@@ -1,12 +1,9 @@
-import warnings
 from datetime import datetime
 
 import pandas as pd  # read csv, df manipulation
 import plotly.express as px
 import requests
 import streamlit as st  # 🎈 data web app development
-
-warnings.filterwarnings("ignore", category=UserWarning, message="Can't initialize NVML")
 
 # Initialize streamlit
 st.set_page_config(
@@ -112,7 +109,6 @@ tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0, "neutral": 0}
 label_mapping = {0: "negative", 1: "neutral", 2: "positive"}
 label_mapping_raw_data = {0: "negative", 2: "neutral", 4: "positive"}
-user2sentiments_map = {}
 results = []
 sentiment_time_series = []
 
@@ -132,16 +128,6 @@ if collect_btn:
 
             if sentiment_pred is not None:
                 sentiment_cnt[sentiment_pred] += 1
-
-                # Update user to sentiments map
-                if row[4] not in user2sentiments_map:
-                    user2sentiments_map[row[4]] = {
-                        "positive": 0,
-                        "negative": 0,
-                        "neutral": 0,
-                    }
-
-                user2sentiments_map[row[4]][sentiment_pred] += 1
 
                 with placeholder.container():
                     # create three columns
@@ -165,18 +151,6 @@ if collect_btn:
             tweet_datetime = convert_to_datetime(row[2])
             sentiment_time_series.append([tweet_datetime.date(), sentiment_pred])
 
-    # Convert user2sentiments_map to a DataFrame
-    user_sentiments_list = []
-    for user_id, sentiments in user2sentiments_map.items():
-        for sentiment, count in sentiments.items():
-            user_sentiments_list.append({"user_id": user_id, "sentiment": sentiment, "count": count})
-
-    user_sentiments_df = pd.DataFrame(user_sentiments_list)
-
-    # Add an interactive plot to display user to sentiments map
-    with st.expander("User to Sentiments Map", expanded=True):
-        user_sentiments_fig = update_user_sentiments_map(user_sentiments_df)
-        st.plotly_chart(user_sentiments_fig, use_container_width=True)
 
 # Create columns for the donut and line charts
 col1, col2 = st.columns(2)
@@ -192,14 +166,25 @@ with col2:
             df_sentiment_time_series.groupby(["Date", "Sentiment"]).size().reset_index(name="Count")
         )
 
-        # Create the line graph
+        # Apply a moving average to smooth the 'Count' values
+        sentiment_count_per_day["Smoothed Count"] = sentiment_count_per_day.groupby("Sentiment")["Count"].transform(
+            lambda x: x.rolling(window=3, min_periods=1).mean()
+        )
+
+        # Create a smoother line graph using the smoothed data
         line_fig = px.line(
             sentiment_count_per_day,
             x="Date",
-            y="Count",
+            y="Smoothed Count",
             color="Sentiment",
-            title="Sentiment Count Over Time",
+            title="Smoothed Sentiment Count Over Time",
         )
+
+        # Update the layout for better visualization
+        line_fig.update_traces(mode="lines+markers")
+        line_fig.update_layout(xaxis_title="Date", yaxis_title="Tweet Count", hovermode="x unified")
+
+        # Display the plot
         st.plotly_chart(line_fig, use_container_width=True)
 # For Debug
 # st.table(pd.DataFrame(results, columns=["Tweet_Content", "Actual", "Prediction"]))
