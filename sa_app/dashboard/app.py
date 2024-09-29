@@ -85,6 +85,7 @@ placeholder = st.empty()
 tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0, "neutral": 0}
 label_mapping = {0: "negative", 1: "neutral", 2: "positive"}
+label_mapping_raw_data = {0: "negative", 2: "neutral", 4: "positive"}
 
 results = []
 sentiment_time_series = []
@@ -135,7 +136,7 @@ if collect_btn:
 
                     kpi4.metric(label="Neutral Count", value=sentiment_cnt["neutral"])
 
-                    results.append([row[5], label_mapping[row[0]], sentiment_pred])
+                    results.append([row[5], label_mapping_raw_data[row[0]], sentiment_pred])
 
             tweet_datetime = convert_to_datetime(row[2])
             sentiment_time_series.append([tweet_datetime.date(), sentiment_pred])
