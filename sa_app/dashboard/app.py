@@ -1,4 +1,5 @@
 import warnings
+from datetime import datetime
 
 import pandas as pd  # read csv, df manipulation
 import plotly.express as px
@@ -47,7 +48,10 @@ dataset_url = (
 
 def update_donut(sentiment_cnt_dict):
     sentiment_data = pd.DataFrame(
-        {"Sentiment": list(sentiment_cnt_dict.keys()), "Count": list(sentiment_cnt_dict.values())}
+        {
+            "Sentiment": list(sentiment_cnt_dict.keys()),
+            "Count": list(sentiment_cnt_dict.values()),
+        }
     )
     fig = px.pie(sentiment_data, names="Sentiment", values="Count", hole=0.5)
     fig.update_traces(textinfo="percent+label", pull=[0.2, 0])
@@ -62,10 +66,18 @@ def get_data_iterator() -> pd.DataFrame:
     return df
 
 
+# Function to convert timestamp to datetime
+def convert_to_datetime(timestamp_str):
+    return datetime.strptime(timestamp_str, "%a %b %d %H:%M:%S PDT %Y")
+
+
 # dashboard title
 st.title("Sentiment Analysis Dashboard")
 
-topic_limit = st.text_input(label="Number of tweets to be analysed", placeholder="Enter # of tweets to be analysed")
+topic_limit = st.text_input(
+    label="Number of tweets to be analysed",
+    placeholder="Enter # of tweets to be analysed",
+)
 collect_btn = st.button("Start collecting")
 
 # creating a single-element container
@@ -75,6 +87,7 @@ sentiment_cnt = {"positive": 0, "negative": 0}
 label_mapping = {0: "negative", 4: "positive", 1: "positive"}
 
 results = []
+sentiment_time_series = []
 
 if collect_btn:
     df_iterator = get_data_iterator().sample(int(topic_limit))
@@ -106,7 +119,26 @@ if collect_btn:
 
                     kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
 
-                    results.append([row[5], label_mapping[row[0]]])
+                    results.append([row[5], label_mapping[row[0]], sentiment_pred])
+
+            tweet_datetime = convert_to_datetime(row[2])
+            sentiment_time_series.append([tweet_datetime.date(), sentiment_pred])
 
 update_donut(sentiment_cnt)
-st.table(results)
+
+if sentiment_time_series:
+    df_sentiment_time_series = pd.DataFrame(sentiment_time_series, columns=["Date", "Sentiment"])
+    sentiment_count_per_day = df_sentiment_time_series.groupby(["Date", "Sentiment"]).size().reset_index(name="Count")
+
+    # Create the line graph
+    line_fig = px.line(
+        sentiment_count_per_day,
+        x="Date",
+        y="Count",
+        color="Sentiment",
+        title="Sentiment Count Over Time",
+    )
+    st.plotly_chart(line_fig, use_container_width=True)
+
+# For Debug
+st.table(pd.DataFrame(results, columns=["Tweet_Content", "Actual", "Prediction"]))
