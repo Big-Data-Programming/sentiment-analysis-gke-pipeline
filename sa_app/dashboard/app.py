@@ -83,8 +83,8 @@ collect_btn = st.button("Start analysis")
 # creating a single-element container
 placeholder = st.empty()
 tweet_count = 0
-sentiment_cnt = {"positive": 0, "negative": 0}
-label_mapping = {0: "negative", 4: "positive", 1: "neutral"}
+sentiment_cnt = {"positive": 0, "negative": 0, "neutral": 0}
+label_mapping = {0: "negative", 1: "neutral", 2: "positive"}
 
 results = []
 sentiment_time_series = []
@@ -108,7 +108,19 @@ if collect_btn:
 
                 with placeholder.container():
                     # create three columns
-                    kpi1, kpi2, kpi3 = st.columns(3)
+                    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+
+                    # Centering the values
+                    st.markdown(
+                        """
+                                <style>
+                                [data-testid="metric-container"] {
+                                    justify-content: center; /* Center the metric values */
+                                }
+                                </style>
+                                """,
+                        unsafe_allow_html=True,
+                    )
 
                     # fill in those three columns with respective metrics or KPIs
                     kpi1.metric(
@@ -120,6 +132,8 @@ if collect_btn:
                     kpi2.metric(label="Positive Count", value=sentiment_cnt["positive"])
 
                     kpi3.metric(label="Negative Count", value=sentiment_cnt["negative"])
+
+                    kpi4.metric(label="Neutral Count", value=sentiment_cnt["neutral"])
 
                     results.append([row[5], label_mapping[row[0]], sentiment_pred])
 

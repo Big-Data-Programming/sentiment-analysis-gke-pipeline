@@ -37,7 +37,7 @@ training_params:
   base-model-name: "cardiffnlp/twitter-roberta-base"
   train_mode: "fine_tune_base_model"
   debug_size: 3
-  tokenizer: 'bert-base-uncased'
+  tokenizer: 'cardiffnlp/twitter-roberta-base-sentiment-latest'
   learning_rate: 1e-5
   num_epochs: 1
 
@@ -90,4 +90,4 @@ training_params:
 inference_params:
   model_dir: "bdp_grp2-org/wandb-registry-model/test:v0"
   default_model_name: "best_model-v4.ckpt"
-  base_model_name: "cardiffnlp/twitter-roberta-base"
+  base_model_name: "cardiffnlp/twitter-roberta-base-sentiment-latest"
