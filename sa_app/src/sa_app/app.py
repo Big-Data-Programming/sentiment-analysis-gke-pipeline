@@ -107,7 +107,7 @@ def train(
     model_config, model = load_model(training_params)
     tokenizer = AutoTokenizer.from_pretrained(training_params.get("base-model-name"))
     train_dataset, valid_dataset = get_dataset(dataset_params, tokenizer)
-    loggers = init_model_loggers(dataset_params, training_params)
+    loggers = init_model_loggers(training_params)
     callbacks = init_model_callbacks(training_params)
 
     # PL wrapper

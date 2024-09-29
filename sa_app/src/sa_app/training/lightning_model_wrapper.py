@@ -54,7 +54,7 @@ class LightningModelWrapper(pl.LightningModule):
         probs = self.softmax(output.logits[:, 0, :])
         # predicted_classes = torch.argmax(probs, dim=-1)
 
-        output.loss = self.loss_fn(output.logits[:, 0, :], labels)  # Taking logit corresp. to CLS token
+        output.loss = self.loss_fn(output.logits[:, 0, :], labels)
         return {"logits": probs, "loss": output.loss}
 
     def training_step(self, batch: dict, batch_idx: int) -> Dict:
