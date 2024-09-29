@@ -5,8 +5,8 @@ from typing import Dict, List
 from pytorch_lightning.loggers import WandbLogger
 
 
-def init_model_loggers(dataset_params: Dict, training_params: Dict) -> List[WandbLogger]:
-    wandb_project_name = dataset_params.get("wandb_project_name")
+def init_model_loggers(training_params: Dict) -> List[WandbLogger]:
+    wandb_project_name = training_params.get("wandb_storage").get("name")
     log_dir = training_params.get("logging").get("log_dir")
     wandb_logger = WandbLogger(project=wandb_project_name, save_dir=log_dir)
     return [

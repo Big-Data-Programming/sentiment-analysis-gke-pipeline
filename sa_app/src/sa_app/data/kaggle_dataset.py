@@ -1,7 +1,6 @@
 from typing import Dict
 
 import pandas as pd
-from tqdm import tqdm
 
 
 def get_label_counts(df: pd.DataFrame) -> Dict[str, int]:
@@ -28,22 +27,36 @@ def get_file_names(file_name: str) -> tuple[str, str, str]:
     return train_file, valid_file, test_file
 
 
-def split_dataset(file: str, train_ratio: float = 0.7, test_ratio: float = 0.15, valid_ratio: float = 0.15) -> bool:
+def split_dataset(
+    file: str,
+    train_ratio: float = 0.7,
+    test_ratio: float = 0.15,
+    valid_ratio: float = 0.15,
+) -> bool:
     train_file, valid_file, test_file = get_file_names(file)
-    df = pd.read_csv(file, encoding="latin-1", header=None, chunksize=1000)
-    # label_count = get_label_counts(df)
-    total_chunks = sum([len(i) for i in df])
-    pbar = tqdm(total=total_chunks, desc="Processing chunks", unit="chunk")
-    for chunk in pd.read_csv(file, encoding="latin-1", header=None, chunksize=1000):
-        train_idx = int(train_ratio * len(chunk))
-        valid_idx = int(valid_ratio * len(chunk))
-        test_idx = int(test_ratio * len(chunk))
-        chunk.iloc[:train_idx, :].to_csv(train_file, mode="a", header=False, index=False)
-        chunk.iloc[train_idx : train_idx + valid_idx, :].to_csv(valid_file, mode="a", header=False, index=False)
-        chunk.iloc[train_idx + valid_idx : train_idx + valid_idx + test_idx, :].to_csv(
-            test_file, mode="a", header=False, index=False
-        )
-        pbar.update(1000)
+
+    # Load the entire dataset
+    df = pd.read_csv(file, encoding="latin-1", header=None)
+
+    # Shuffle the dataset
+    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    # Calculate the split indices
+    total_samples = len(df)
+    train_idx = int(train_ratio * total_samples)
+    valid_idx = int(valid_ratio * total_samples)
+
+    # Split the dataset
+    train_df = df.iloc[:train_idx]
+    valid_df = df.iloc[train_idx : train_idx + valid_idx]
+    test_df = df.iloc[train_idx + valid_idx :]
+
+    # Save the datasets
+    train_df.to_csv(train_file, mode="w", header=False, index=False)
+    valid_df.to_csv(valid_file, mode="w", header=False, index=False)
+    test_df.to_csv(test_file, mode="w", header=False, index=False)
+
+    print("Data split completed successfully!")
     return True
 
 

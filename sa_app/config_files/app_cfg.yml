@@ -3,11 +3,10 @@
 #################
 seed: &seed 42
 
-
 ###############
 # Data params #
 ###############
-dataset_params:  
+dataset_params:
   # wandb_storage: # If this is defined the data artifacts are downloaded from wandb
   #   wandb_dataset_url: "bdp_grp2/sa-roberta/sentiment-dataset:v1"
   #   src_file_type: "csv"
@@ -18,26 +17,21 @@ dataset_params:
   max_length: 128
   batch_size: 32
   preprocessors:
-    base_cleaning:
-      {}
-    lowcase:
-      {}
+    base_cleaning: {}
+    lowcase: {}
     stem:
-      language: 'english'
+      language: "english"
     lemma:
-      model_name: 'en_core_web_sm'
-    cardiffnlp_processor:
-      {}
-
+      model_name: "en_core_web_sm"
+    cardiffnlp_processor: {}
 
 ###################
 # Training params #
 ###################
 training_params:
-  base-model-name: "cardiffnlp/twitter-roberta-base"
+  base-model-name: "cardiffnlp/twitter-roberta-base-sentiment-latest"
   train_mode: "fine_tune_base_model"
-  debug_size: 3
-  tokenizer: 'cardiffnlp/twitter-roberta-base-sentiment-latest'
+  tokenizer: "cardiffnlp/twitter-roberta-base-sentiment-latest"
   learning_rate: 1e-5
   num_epochs: 1
 
@@ -51,22 +45,21 @@ training_params:
     weight_decay: 0.01
 
   lr_scheduler:
-    type_: 'lin_warmup'
-    interval: 'step'
+    type_: "lin_warmup"
+    interval: "step"
     lr_warmup: 0.1
 
   trainer:
     max_steps: 10
-#    max_epochs: 20
-#    accumulate_grad_batches: 1 # use when memory is not sufficient
+    #    max_epochs: 20
+    #    accumulate_grad_batches: 1 # use when memory is not sufficient
     gradient_clip_val: 1
-    # precision: bf16-mixed
-    precision: 16-mixed
-    limit_train_batches: 3
-    limit_val_batches: 3
+    precision: bf16-mixed
+    # precision: 16-mixed
+    limit_train_batches: 50
+    limit_val_batches: 5
     log_every_n_steps: 3
-    val_check_interval: 1
-    
+    val_check_interval: 3
 
   wandb_storage:
     name: "sa-roberta"
@@ -78,10 +71,9 @@ training_params:
 
   callbacks:
     dirpath: "C:\\Users\\mini-KRONOS\\OneDrive\\Documents\\Github\\models"
-    monitor_var: 'valid_acc_step'
-    monitor_var_mode: 'max'
+    monitor_var: "valid_acc_step"
+    monitor_var_mode: "max"
     save_top_k: 1
-
 
 ####################
 # Inference params #
