@@ -84,7 +84,7 @@ collect_btn = st.button("Start collecting")
 placeholder = st.empty()
 tweet_count = 0
 sentiment_cnt = {"positive": 0, "negative": 0}
-label_mapping = {0: "negative", 4: "positive", 1: "positive"}
+label_mapping = {0: "negative", 4: "positive", 1: "neutral"}
 
 results = []
 sentiment_time_series = []
@@ -126,21 +126,30 @@ if collect_btn:
             tweet_datetime = convert_to_datetime(row[2])
             sentiment_time_series.append([tweet_datetime.date(), sentiment_pred])
 
-update_donut(sentiment_cnt)
+# Create columns for the donut and line charts
+col1, col2 = st.columns(2)
 
-if sentiment_time_series:
-    df_sentiment_time_series = pd.DataFrame(sentiment_time_series, columns=["Date", "Sentiment"])
-    sentiment_count_per_day = df_sentiment_time_series.groupby(["Date", "Sentiment"]).size().reset_index(name="Count")
+with col1:
+    st.subheader("Sentiment Distribution")
+    donut_fig = update_donut(sentiment_cnt)
+    st.plotly_chart(donut_fig, use_container_width=True)
 
-    # Create the line graph
-    line_fig = px.line(
-        sentiment_count_per_day,
-        x="Date",
-        y="Count",
-        color="Sentiment",
-        title="Sentiment Count Over Time",
-    )
-    st.plotly_chart(line_fig, use_container_width=True)
+with col2:
+    st.subheader("Sentiment Count Over Time")
+    if sentiment_time_series:
+        df_sentiment_time_series = pd.DataFrame(sentiment_time_series, columns=["Date", "Sentiment"])
+        sentiment_count_per_day = (
+            df_sentiment_time_series.groupby(["Date", "Sentiment"]).size().reset_index(name="Count")
+        )
 
+        # Create the line graph
+        line_fig = px.line(
+            sentiment_count_per_day,
+            x="Date",
+            y="Count",
+            color="Sentiment",
+            title="Sentiment Count Over Time",
+        )
+        st.plotly_chart(line_fig, use_container_width=True)
 # For Debug
 st.table(pd.DataFrame(results, columns=["Tweet_Content", "Actual", "Prediction"]))
