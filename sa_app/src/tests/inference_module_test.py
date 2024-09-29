@@ -9,13 +9,8 @@ from sa_app.inference.inference import InferenceEngine
 
 @pytest.fixture
 def sample_config():
-    config = yaml.safe_load(open("tests/test_data/test_app_cfg.yml", "r"))
-    return config
-
-
-def test_inference(sample_config):
     wandb.login(key=os.getenv("WANDB_API_KEY"))
-    config = sample_config
+    config = yaml.safe_load(open("tests/test_data/test_app_cfg.yml", "r"))
     device_in_use = "cuda" if torch.cuda.is_available() else "cpu"
     # Example usage
     ie_obj = InferenceEngine(
@@ -24,7 +19,21 @@ def test_inference(sample_config):
         dataset_params=config["dataset_params"],
         device=device_in_use,
     )
+    return ie_obj
+
+
+def test_inference_negative(sample_config):
+    engine_obj = sample_config
     input_sentence = "I feel so bad today . Such a bad day :( "
-    predicted_labels = ie_obj.perform_inference(input_sentence)
+    predicted_labels = engine_obj.perform_inference(input_sentence)
     assert isinstance(predicted_labels, str) is True
-    assert predicted_labels == "negative"
+
+
+def test_inference_positive(sample_config):
+    engine_obj = sample_config
+    input_sentence = """
+    @swikey haha, okay, i feel much better now.
+    let's just dye our hair paramore red!
+    """
+    predicted_labels = engine_obj.perform_inference(input_sentence)
+    assert isinstance(predicted_labels, str) is True

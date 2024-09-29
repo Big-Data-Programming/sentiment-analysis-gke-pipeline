@@ -78,7 +78,7 @@ topic_limit = st.text_input(
     label="Number of tweets to be analysed",
     placeholder="Enter # of tweets to be analysed",
 )
-collect_btn = st.button("Start collecting")
+collect_btn = st.button("Start analysis")
 
 # creating a single-element container
 placeholder = st.empty()
