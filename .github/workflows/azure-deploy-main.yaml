@@ -2,6 +2,8 @@ name: Deploy to AKS
 
 on:
   push:
+    paths:
+        - kubernetes-manifests/*
     branches:
       - main
 
