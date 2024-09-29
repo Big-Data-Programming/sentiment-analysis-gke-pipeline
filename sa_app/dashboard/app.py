@@ -97,7 +97,9 @@ if collect_btn:
             u_id = insert_to_db(row[4], row[5])
             # Run model inference here
             sentiment_pred = get_sentiment(u_id, row[5])
-            # sentiment_pred = label_mapping[row[0]]
+
+            # TODO : Hardcoded for testing frontend
+            sentiment_pred = label_mapping[row[0]]
             print(f"For {row[5]}, prediction is : {sentiment_pred}")
             tweet_count += 1
 
