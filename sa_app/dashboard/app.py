@@ -2,10 +2,12 @@ from datetime import datetime
 
 import pandas as pd  # read csv, df manipulation
 import plotly.express as px
-import plotly.figure_factory as ff
+
+# import plotly.figure_factory as ff
 import requests
 import streamlit as st  # 🎈 data web app development
-from sklearn.metrics import confusion_matrix
+
+# from sklearn.metrics import confusion_matrix
 
 # Initialize streamlit
 st.set_page_config(
@@ -187,35 +189,35 @@ with col2:
         # Display the plot
         st.plotly_chart(line_fig, use_container_width=True)
 
-if results:
-    # Create a DataFrame from the results list
-    df_results = pd.DataFrame(results, columns=["Tweet_Content", "Actual", "Prediction"])
+# if results:
+#     # Create a DataFrame from the results list
+#     df_results = pd.DataFrame(results, columns=["Tweet_Content", "Actual", "Prediction"])
 
-    # Compute the confusion matrix
-    cm = confusion_matrix(
-        df_results["Actual"],
-        df_results["Prediction"],
-        labels=["negative", "neutral", "positive"],
-    )
+#     # Compute the confusion matrix
+#     cm = confusion_matrix(
+#         df_results["Actual"],
+#         df_results["Prediction"],
+#         labels=["negative", "neutral", "positive"],
+#     )
 
-    # Display labels
-    cm_labels = ["negative", "neutral", "positive"]
+#     # Display labels
+#     cm_labels = ["negative", "neutral", "positive"]
 
-    # Create a heatmap using plotly
-    fig_cm = ff.create_annotated_heatmap(
-        z=cm,
-        x=cm_labels,
-        y=cm_labels,
-        annotation_text=cm.astype(str),
-        colorscale="Blues",
-        showscale=True,
-    )
+#     # Create a heatmap using plotly
+#     fig_cm = ff.create_annotated_heatmap(
+#         z=cm,
+#         x=cm_labels,
+#         y=cm_labels,
+#         annotation_text=cm.astype(str),
+#         colorscale="Blues",
+#         showscale=True,
+#     )
 
-    # Update layout for better visualization
-    fig_cm.update_layout(title="Confusion Matrix", xaxis_title="Predicted", yaxis_title="Actual")
+#     # Update layout for better visualization
+#     fig_cm.update_layout(title="Confusion Matrix", xaxis_title="Predicted", yaxis_title="Actual")
 
-    # Display the confusion matrix using Streamlit
-    st.plotly_chart(fig_cm, use_container_width=True)
+#     # Display the confusion matrix using Streamlit
+#     st.plotly_chart(fig_cm, use_container_width=True)
 
 
 # For Debug
