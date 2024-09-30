@@ -4,3 +4,4 @@ pandas
 PyYAML
 tqdm
 tweepy
+scikit-learn
