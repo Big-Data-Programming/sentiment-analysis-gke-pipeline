@@ -1,9 +1,8 @@
-# import os
+import os
 from typing import Dict
 
 import torch
-
-# import wandb
+import wandb
 import yaml
 from sa_app.common.utils import parse_args
 from sa_app.data.data_cleaner import StackedPreprocessor
@@ -18,7 +17,6 @@ class InferenceEngine:
         dataset_params: Dict,
         device: str,
     ):
-        # TODO : Download artifacts from wandb
         # Set the device to CPU or GPU
         self.device = device
 
@@ -32,26 +30,24 @@ class InferenceEngine:
         # Dataset initialization
         # dataset_obj = InitializeDataset(dataset_params)
         # _, label_mapping_path = dataset_obj()
-        # print(label_mapping_path)
         # self.label_mapping = load_mapping(label_mapping_path)
-        self.label_mapping = ["negative", "positive"]
 
     def get_wandb_model(self, inference_params):
         # Download checkpoint from wandb
-        # run = wandb.init()
-        # artifact = run.use_artifact(inference_params["model_dir"], type="model")
-        # artifact_dir = artifact.download()
+        run = wandb.init()
+        artifact = run.use_artifact(inference_params["model_dir"], type="model")
+        artifact_dir = artifact.download()
 
         # Load checkpoint into the pretrained model
-        # checkpoint_pth = os.path.join(artifact_dir, inference_params["default_model_name"])
-        # state_dict = torch.load(checkpoint_pth)
-        # new_state_dict = {}
-        # for key in state_dict["state_dict"].keys():
-        #     if key.startswith("model."):
-        #         new_key = key.replace("model.", "")  # Remove 'model.' prefix
-        #         new_state_dict[new_key] = state_dict["state_dict"][key]
+        checkpoint_pth = os.path.join(artifact_dir, inference_params["default_model_name"])
+        state_dict = torch.load(checkpoint_pth)
+        new_state_dict = {}
+        for key in state_dict["state_dict"].keys():
+            if key.startswith("model."):
+                new_key = key.replace("model.", "")  # Remove 'model.' prefix
+                new_state_dict[new_key] = state_dict["state_dict"][key]
 
-        config = AutoConfig.from_pretrained(inference_params["base_model_name"])  # TODO: Remove hardcoding
+        config = AutoConfig.from_pretrained(inference_params["base_model_name"])
         model = AutoModelForSequenceClassification.from_config(config).to(self.device)
         # model.load_state_dict(new_state_dict)
 
