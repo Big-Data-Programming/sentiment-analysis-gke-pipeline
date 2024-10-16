@@ -59,6 +59,10 @@ Run below cmds from the root path of this repo
 ## Workflow rules :
 For training :
 1. wildcard - `training/*` if matched will run the model-training workflow
+2. 
+Workflow (via github action) flow diagram :
+![image](https://github.com/user-attachments/assets/18b92fc7-b891-4ca6-a4a5-592a593be748)
+
 
 ## Screenshots from the frontend : 
 
